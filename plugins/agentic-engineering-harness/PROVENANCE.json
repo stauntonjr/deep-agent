@@ -1,0 +1,149 @@
+{
+  "schema_version": "1.0",
+  "plugin": {
+    "name": "agentic-engineering-harness",
+    "version": "0.1.1+codex.20260825205827"
+  },
+  "manifest": {
+    "path": "plugins/agentic-engineering-harness/.codex-plugin/plugin.json",
+    "sha256": "395e43ce6892de7b3eea3244cf7ee3949b7f70a71ee96a319115d8d5b78ed87c"
+  },
+  "source": {
+    "repository": "https://github.com/stauntonjr/agentic-project-template",
+    "root": ".agents/skills",
+    "authority": "canonical-editable-source"
+  },
+  "distribution": {
+    "root": "plugins/agentic-engineering-harness/skills",
+    "authority": "generated-mirror-do-not-edit"
+  },
+  "license": {
+    "source": "LICENSE",
+    "sha256": "096633e7fc86d71172d976ed2b00baaeee861fdd805f312c4698144c4c3355a6"
+  },
+  "excluded_project_policy": [
+    "AGENTS.md",
+    ".codex/",
+    ".github/",
+    ".pi/",
+    "docs/",
+    "harness/"
+  ],
+  "files": {
+    "execute-engineering-loop/SKILL.md": {
+      "source_sha256": "74c94e3540aeb745700f71d9f8d3cda501fddc414e98ea9450c974ea9d79be40",
+      "distribution_sha256": "0815e1748ea445e4017374da9a57a65d73f209e0ed0ede7bf1a1ed590806c9c9",
+      "transformation": "namespace-skill-references"
+    },
+    "execute-engineering-loop/agents/openai.yaml": {
+      "source_sha256": "208d30ce0c88367bcc63080982ee32fa87c24753b09994f392e073a456c8c628",
+      "distribution_sha256": "8519e8d1e3e90b88251c1f2e85be018d1d933214323d9bd9980e1b25974ed780",
+      "transformation": "namespace-skill-references"
+    },
+    "execute-engineering-loop/references/handoff-contract.md": {
+      "source_sha256": "a0675d49827bf6f3e325bdfb48387ed12f7b4444f9ac10e0c9526a089cfa0f7b",
+      "distribution_sha256": "a0675d49827bf6f3e325bdfb48387ed12f7b4444f9ac10e0c9526a089cfa0f7b",
+      "transformation": "identity"
+    },
+    "execute-engineering-loop/references/verification-efficiency.md": {
+      "source_sha256": "59f182df59e36dd8b0076c76f8adc1adc1abfca5b8ee930e6225abca6ed79008",
+      "distribution_sha256": "59f182df59e36dd8b0076c76f8adc1adc1abfca5b8ee930e6225abca6ed79008",
+      "transformation": "identity"
+    },
+    "loop-report/SKILL.md": {
+      "source_sha256": "80df1895fc123b92d790c264d1115b768c1abc673fa3fd237c1545355db40dcf",
+      "distribution_sha256": "80df1895fc123b92d790c264d1115b768c1abc673fa3fd237c1545355db40dcf",
+      "transformation": "identity"
+    },
+    "loop-report/agents/openai.yaml": {
+      "source_sha256": "51f830d2c7e8e97ecc8583139ff4fb8feaa9ff52a25d18bcf56fd6400986178d",
+      "distribution_sha256": "96f5ab8a7650a6952211de3a7f3e3acf0ec47205b5a3f222b1cf781ad843e999",
+      "transformation": "namespace-skill-references"
+    },
+    "loop-report/references/report-contract.md": {
+      "source_sha256": "e495e502c1155cedffcd00c5d885f5d2cd799e5da6cbd0a9507d84a6aab11339",
+      "distribution_sha256": "e495e502c1155cedffcd00c5d885f5d2cd799e5da6cbd0a9507d84a6aab11339",
+      "transformation": "identity"
+    },
+    "manage-github-planning/SKILL.md": {
+      "source_sha256": "c5181921e717dc9c42a4caaea1eb6d8bb1806a38ad7d9f42c1b53c6c3daa4eff",
+      "distribution_sha256": "c5181921e717dc9c42a4caaea1eb6d8bb1806a38ad7d9f42c1b53c6c3daa4eff",
+      "transformation": "identity"
+    },
+    "manage-github-planning/agents/openai.yaml": {
+      "source_sha256": "8c38c6baa357b97c9cf49af8c86474e1c5bb6aea9d61da6ba644d015a78ebc9a",
+      "distribution_sha256": "f1e3d597872ba12f02fc924e18091163c47dce12aa56751397c293f02269d2fe",
+      "transformation": "namespace-skill-references"
+    },
+    "manage-github-planning/references/safety.md": {
+      "source_sha256": "5822cde2726e0a523619f236310a8e4a1ef7575032dd8fb717fd9b6bbdae7cb3",
+      "distribution_sha256": "5822cde2726e0a523619f236310a8e4a1ef7575032dd8fb717fd9b6bbdae7cb3",
+      "transformation": "identity"
+    },
+    "project-intake/SKILL.md": {
+      "source_sha256": "1252a83a8ccfc61984d381722c8188264e42a0ca1251f5686de71b322619023a",
+      "distribution_sha256": "1252a83a8ccfc61984d381722c8188264e42a0ca1251f5686de71b322619023a",
+      "transformation": "identity"
+    },
+    "project-intake/agents/openai.yaml": {
+      "source_sha256": "b175ab7b8a0126b42148431c7cd893bdbd74543614ba0ae753cdbff57cba263c",
+      "distribution_sha256": "f1fb99419886882a75576a20fd4eb24b654eb58db26235a833ef0bdfd67ccbe2",
+      "transformation": "namespace-skill-references"
+    },
+    "project-intake/references/question-bank.md": {
+      "source_sha256": "73087914eb57cfc01bb726ed583823f608f5e650a46d35761acd047b93331eca",
+      "distribution_sha256": "73087914eb57cfc01bb726ed583823f608f5e650a46d35761acd047b93331eca",
+      "transformation": "identity"
+    },
+    "record-architecture-decision/SKILL.md": {
+      "source_sha256": "2a71ac7d78d03016c47302b476650c42a9c526170f846d9c8a8b54135a8ea69b",
+      "distribution_sha256": "cf5bd94b7c0d49fe7e11efaa53bfd243db70748975b8357a9324a6024ab276a7",
+      "transformation": "namespace-skill-references"
+    },
+    "record-architecture-decision/agents/openai.yaml": {
+      "source_sha256": "0c5609008adc2bf0408a20baf83f51fb7a6d83d2ac40cfc8bdb6aa1a7266bcd0",
+      "distribution_sha256": "14a795f08cc90508151d076ee558d214d4ebab474b7935d07f52c220c10bb6ed",
+      "transformation": "namespace-skill-references"
+    },
+    "record-architecture-decision/references/decision-criteria.md": {
+      "source_sha256": "538ec0720dee86b758b25764a77dce5cb16c3a1769f08cae3b4a8264dd58296b",
+      "distribution_sha256": "538ec0720dee86b758b25764a77dce5cb16c3a1769f08cae3b4a8264dd58296b",
+      "transformation": "identity"
+    },
+    "release-readiness/SKILL.md": {
+      "source_sha256": "f23ba5a46d28be127043a01b8ce9795aff356f9263f2a2c6ef659abc3fa6a0d6",
+      "distribution_sha256": "f23ba5a46d28be127043a01b8ce9795aff356f9263f2a2c6ef659abc3fa6a0d6",
+      "transformation": "identity"
+    },
+    "release-readiness/agents/openai.yaml": {
+      "source_sha256": "fec5c0c9d7328670070867616ee402f9df0a3cfa8bcd607d4a29937c1eafa5e3",
+      "distribution_sha256": "8858bf06b41b039450d48c2ce0d541e53f37622aeaa1f68a2aeebcb30fafe54f",
+      "transformation": "namespace-skill-references"
+    },
+    "release-readiness/references/checklist.md": {
+      "source_sha256": "815452be6209076add369b6eeba64f3215563518c8ffa5fe554fc457908f49d1",
+      "distribution_sha256": "815452be6209076add369b6eeba64f3215563518c8ffa5fe554fc457908f49d1",
+      "transformation": "identity"
+    },
+    "research-existing-solutions/SKILL.md": {
+      "source_sha256": "3db17d1c5ae77693153a5638558f28c4432d5ae01682ecabdb49a476f2cbb8ac",
+      "distribution_sha256": "6e0855dfa8880384f5b13b5dd3666ddc53446af615427596ec9dfaf16003eb05",
+      "transformation": "namespace-skill-references"
+    },
+    "research-existing-solutions/agents/openai.yaml": {
+      "source_sha256": "e4b233d399fa2a148ee39343210348be3b21f5d2a18d4be1046eb99aa3b4ba79",
+      "distribution_sha256": "d4c3349a528ddd3c59bd9b6de1ebe4d701126d149a89d81ab6944d85f9947916",
+      "transformation": "namespace-skill-references"
+    },
+    "research-existing-solutions/references/research-contract.md": {
+      "source_sha256": "632eeda8f4c1a151516e973a218a33057b0cf9358d5250ba55836f8a7167a710",
+      "distribution_sha256": "632eeda8f4c1a151516e973a218a33057b0cf9358d5250ba55836f8a7167a710",
+      "transformation": "identity"
+    },
+    "research-existing-solutions/references/source-hubs.md": {
+      "source_sha256": "8598fd4d781087837a2105f9819081022b475d5723d4d46d1471965f37b2a567",
+      "distribution_sha256": "8598fd4d781087837a2105f9819081022b475d5723d4d46d1471965f37b2a567",
+      "transformation": "identity"
+    }
+  }
+}

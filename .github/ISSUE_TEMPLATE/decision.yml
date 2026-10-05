@@ -1,0 +1,37 @@
+name: Decision
+description: Track a material architecture, product, risk, or autonomy decision
+title: "[Decision] "
+labels: ["type:decision", "human-decision"]
+body:
+  - type: textarea
+    id: decision_in_scope
+    attributes:
+      label: Decision in scope
+      description: What exact decision must be made now?
+    validations:
+      required: true
+  - type: textarea
+    id: decision_out_of_scope
+    attributes:
+      label: Explicitly outside this decision
+      description: What adjacent choices, implementations, risks, and future decisions remain unresolved?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and constraints
+    validations:
+      required: true
+  - type: textarea
+    id: options
+    attributes:
+      label: Options and tradeoffs
+    validations:
+      required: true
+  - type: textarea
+    id: authority
+    attributes:
+      label: Required decider and deadline
+    validations:
+      required: true

@@ -1,0 +1,121 @@
+{
+  "schema_version": "1.1",
+  "id": "engineering-loop",
+  "description": "Default evidence-producing loop for non-trivial repository work.",
+  "start_state": "intake",
+  "terminal_states": ["reported", "blocked", "abandoned"],
+  "retry_policy": {
+    "maximum_consecutive_failures": 3,
+    "on_exhaustion": "stop-and-escalate",
+    "preserve_partial_work": true,
+    "resume_requires": "human-reviewed-structured-handoff",
+    "resume_starts_new_revision": true,
+    "destructive_git_recovery": false,
+    "attempt_identity_required": true,
+    "contract_changes_increment_revision": true,
+    "second_failed_repair_requires_independent_proportionality_review": true
+  },
+  "verification_policy": {
+    "check_tiers": ["static", "targeted", "affected", "full", "external"],
+    "final_full_gate": "exactly-one-executed-passing-current-attempt",
+    "review_collection": "one-deduplicated-batch-before-repair",
+    "ordinary_finding_interrupts_review": false,
+    "emergency_boundaries": [
+      "secret-exposure",
+      "destructive-effect",
+      "uncontrolled-external-effect"
+    ],
+    "reused_evidence_requires": ["source", "sha256 artifact digest", "applicability rationale"],
+    "reused_evidence_cannot_satisfy": "final-full-gate"
+  },
+  "states": [
+    {
+      "id": "intake",
+      "owner": "orchestrator",
+      "requires": ["request", "repository status"],
+      "produces": ["verbatim objective", "criterion IDs", "binding scope contract", "dirty baseline", "context readiness decision"],
+      "gate": "intent, authority, mechanically verifiable acceptance criteria, in-scope work, explicit exclusions, assurance boundary, budget constraints, and revision triggers are clear enough; material gaps are asked or escalated",
+      "next": ["understand", "blocked"]
+    },
+    {
+      "id": "understand",
+      "owner": "explorer",
+      "requires": ["objective", "authoritative sources"],
+      "produces": ["evidence map", "constraints", "unknowns", "build-adopt-adapt-defer assessment", "prior-art research when material"],
+      "gate": "real execution and data boundaries are identified; a current-revision solution assessment exists before planning; standardized, security-sensitive, or ecosystem-provided capabilities have current license, provenance, security, and integration evidence when research is material",
+      "next": ["plan", "blocked"]
+    },
+    {
+      "id": "plan",
+      "owner": "orchestrator",
+      "requires": ["evidence map", "acceptance criteria", "scope contract", "solution assessment"],
+      "produces": ["smallest vertical slice", "verification plan", "declared write set", "write ownership", "complexity triggers"],
+      "gate": "scope, explicit exclusions, exact or prefix write paths, owners, budget constraints, revision triggers, and stop conditions are explicit",
+      "next": ["authorize", "blocked"]
+    },
+    {
+      "id": "authorize",
+      "owner": "orchestrator",
+      "requires": ["planned side effects", "autonomy contract"],
+      "produces": ["authorized actions", "deferred actions"],
+      "gate": "required human approvals exist",
+      "next": ["implement", "blocked", "abandoned"]
+    },
+    {
+      "id": "implement",
+      "owner": "implementer",
+      "requires": ["bounded issue", "owned branch and worktree"],
+      "produces": ["focused change", "implementation notes", "product release-impact recommendation"],
+      "gate": "task-owned changes are ready for verification",
+      "next": ["verify", "blocked"]
+    },
+    {
+      "id": "verify",
+      "owner": "verifier",
+      "requires": ["change", "verification plan"],
+      "produces": ["tiered criterion-linked check evidence", "deduplicated finding batch", "candidate identity", "elapsed verification time"],
+      "gate": "every unwaived criterion has current-attempt evidence or failures are explained; ordinary findings remain in one stable-candidate review cycle until batch closure",
+      "next": ["adversarial-review", "implement", "blocked"]
+    },
+    {
+      "id": "adversarial-review",
+      "owner": "verifier",
+      "requires": ["diff", "raw evidence"],
+      "produces": ["closed review cycle", "revision-bound independent decision", "criterion coverage", "residual risks"],
+      "gate": "reviewer did not author the reviewed work; the review closes clean, batch-ready, or at a critical emergency boundary; and the verdict identifies the same current revision, attempt, commit, and working-tree digest",
+      "next": ["integrate", "proportionality-review", "blocked"]
+    },
+    {
+      "id": "proportionality-review",
+      "owner": "orchestrator",
+      "requires": ["closed finding batch", "matching verifier verdict", "unchanged candidate", "scope contract"],
+      "produces": ["finding dispositions", "objective traceability", "scope delta", "complexity delta", "budget status", "build-adopt-adapt-defer reassessment", "alternatives", "proportionality recommendation", "candidate-bound no-code resolution when applicable"],
+      "gate": "every finding is classified before mutation; every trigger has a current completed solution assessment and may supersede only blocked or candidate-stale evidence; contract expansion cannot proceed as an ordinary repair; parser, sandbox, protocol, cryptography, concurrency, filesystem-security, dependency, write-scope, threat-model, budget, or second-failed-repair triggers have a scope reviewer independent of both implementer and technical verifier; only deferral, human-accepted risk, or emergency stop can resolve without candidate mutation; a mixed emergency resolution preserves every disposition and exclusively binds the next attempt or contract revision",
+      "next": ["implement", "understand", "blocked", "abandoned"]
+    },
+    {
+      "id": "integrate",
+      "owner": "orchestrator",
+      "requires": ["current independent approval", "declared-scope evidence", "clean integration target"],
+      "produces": ["integrated revision", "planning reconciliation"],
+      "gate": "all unwaived criteria are evidenced, exactly one executed current-attempt full gate passed, the verdict is current, no review is open, no undeclared writes exist, and shared Git and GitHub state are consistent",
+      "next": ["report", "blocked"]
+    },
+    {
+      "id": "report",
+      "owner": "orchestrator",
+      "requires": ["loop boundary", "check evidence", "repository state", "current product release-impact assessment"],
+      "produces": ["executive report", "handoff updates"],
+      "gate": "claims are labeled verified, reported, or inferred",
+      "next": ["learn", "reported"]
+    },
+    {
+      "id": "learn",
+      "owner": "orchestrator",
+      "requires": ["report", "failures and corrections"],
+      "produces": ["sanitized correction-log entries", "proposed harness updates", "challenge candidates"],
+      "gate": "repeatable failed paths have a verified correction or explicit unresolved status; policy changes remain proposals pending human review",
+      "next": ["reported"]
+    }
+  ]
+}

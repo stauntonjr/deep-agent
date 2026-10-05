@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.1",
+  "id": "release-policy-integration-v1",
+  "task_class": "cross-file-integration",
+  "prompt": "Implement the release-policy behavior in TASK.md by correcting policy.py and release.py. Preserve the public function names, use only the Python standard library, and change no other file.",
+  "initial_files": [
+    {
+      "path": "TASK.md",
+      "content": "# Task\n\nImplement the release-policy behavior across `policy.py` and `release.py`.\n\n`release_decision(current, candidate, checks_passed, approved)` must:\n\n- require `current` and `candidate` to be strings and both flags to be actual booleans;\n- parse only exact `MAJOR.MINOR.PATCH` versions with non-negative decimal components and no leading zeroes except the single digit `0`;\n- raise `ValueError` for either malformed version;\n- return `deny:checks` when checks have not passed;\n- otherwise return `deny:not-forward` unless the candidate is strictly greater than current;\n- otherwise return `deny:approval` when the major component changes without approval;\n- otherwise return `allow`;\n- preserve `parse_version` in `policy.py` and `release_decision` in `release.py`;\n- use only the Python standard library and edit only those two Python files.\n"
+    },
+    {
+      "path": "policy.py",
+      "content": "\"\"\"Release policy helpers.\"\"\"\n\n\ndef parse_version(value: str) -> tuple[int, int, int]:\n    return tuple(int(part) for part in value.split('.'))\n"
+    },
+    {
+      "path": "release.py",
+      "content": "\"\"\"Release decision.\"\"\"\n\nfrom policy import parse_version\n\n\ndef release_decision(current: str, candidate: str, checks_passed: bool, approved: bool) -> str:\n    if parse_version(candidate) > parse_version(current):\n        return 'allow'\n    return 'deny:not-forward'\n"
+    }
+  ],
+  "writable_paths": ["policy.py", "release.py"],
+  "oracle": {
+    "targets": [
+      {
+        "module": "release",
+        "function": "release_decision",
+        "cases": [
+          {"id": "patch-allow", "args": ["1.2.3", "1.2.4", true, false], "expected": "allow"},
+          {"id": "minor-allow", "args": ["0.5.9", "0.6.0", true, false], "expected": "allow"},
+          {"id": "major-approved", "args": ["1.9.9", "2.0.0", true, true], "expected": "allow"},
+          {"id": "checks-deny", "args": ["1.2.3", "1.2.4", false, true], "expected": "deny:checks"},
+          {"id": "not-forward-equal", "args": ["1.2.3", "1.2.3", true, true], "expected": "deny:not-forward"},
+          {"id": "not-forward-lower", "args": ["1.2.3", "1.1.9", true, true], "expected": "deny:not-forward"},
+          {"id": "major-unapproved", "args": ["1.9.9", "2.0.0", true, false], "expected": "deny:approval"}
+        ],
+        "raises": [
+          {"id": "leading-zero-candidate", "args": ["1.2.3", "01.2.4", true, true], "exception": "ValueError"},
+          {"id": "leading-zero-current", "args": ["01.2.3", "1.2.4", true, true], "exception": "ValueError"},
+          {"id": "prerelease-candidate", "args": ["1.2.3", "1.2.4-rc1", true, true], "exception": "ValueError"},
+          {"id": "prerelease-current", "args": ["1.2.3-rc1", "1.2.4", true, true], "exception": "ValueError"},
+          {"id": "negative-candidate", "args": ["1.2.3", "-1.2.4", true, true], "exception": "ValueError"},
+          {"id": "negative-current", "args": ["-1.2.3", "1.2.4", true, true], "exception": "ValueError"},
+          {"id": "missing-component-candidate", "args": ["1.2.3", "1.2", true, true], "exception": "ValueError"},
+          {"id": "missing-component-current", "args": ["1.2", "1.2.4", true, true], "exception": "ValueError"},
+          {"id": "extra-component-candidate", "args": ["1.2.3", "1.2.4.5", true, true], "exception": "ValueError"},
+          {"id": "extra-component-current", "args": ["1.2.3.4", "1.2.5", true, true], "exception": "ValueError"},
+          {"id": "empty-component-candidate", "args": ["1.2.3", "1..4", true, true], "exception": "ValueError"},
+          {"id": "empty-component-current", "args": ["1..3", "1.2.4", true, true], "exception": "ValueError"},
+          {"id": "plus-sign-candidate", "args": ["1.2.3", "+1.2.4", true, true], "exception": "ValueError"},
+          {"id": "plus-sign-current", "args": ["+1.2.3", "1.2.4", true, true], "exception": "ValueError"},
+          {"id": "whitespace-candidate", "args": ["1.2.3", " 1.2.4", true, true], "exception": "ValueError"},
+          {"id": "whitespace-current", "args": [" 1.2.3", "1.2.4", true, true], "exception": "ValueError"},
+          {"id": "nondigit-candidate", "args": ["1.2.3", "1.two.4", true, true], "exception": "ValueError"},
+          {"id": "nondigit-current", "args": ["1.two.3", "1.2.4", true, true], "exception": "ValueError"},
+          {"id": "wrong-current-type", "args": [1, "1.2.4", true, true], "exception": "TypeError"},
+          {"id": "wrong-candidate-type", "args": ["1.2.3", 2, true, true], "exception": "TypeError"},
+          {"id": "wrong-checks-type", "args": ["1.2.3", "1.2.4", 1, true], "exception": "TypeError"},
+          {"id": "wrong-approved-type", "args": ["1.2.3", "1.2.4", true, 1], "exception": "TypeError"}
+        ]
+      },
+      {
+        "module": "policy",
+        "function": "parse_version",
+        "cases": [
+          {"id": "parse-version-valid", "args": ["10.20.30"], "expected": [10, 20, 30]}
+        ],
+        "raises": [
+          {"id": "parse-leading-zero", "args": ["01.2.3"], "exception": "ValueError"},
+          {"id": "parse-negative", "args": ["-1.2.3"], "exception": "ValueError"},
+          {"id": "parse-missing-component", "args": ["1.2"], "exception": "ValueError"},
+          {"id": "parse-extra-component", "args": ["1.2.3.4"], "exception": "ValueError"},
+          {"id": "parse-empty-component", "args": ["1..3"], "exception": "ValueError"},
+          {"id": "parse-plus-sign", "args": ["+1.2.3"], "exception": "ValueError"},
+          {"id": "parse-whitespace", "args": [" 1.2.3"], "exception": "ValueError"},
+          {"id": "parse-nondigit", "args": ["1.two.3"], "exception": "ValueError"},
+          {"id": "parse-prerelease", "args": ["1.2.3-rc1"], "exception": "ValueError"},
+          {"id": "parse-wrong-type", "args": [123], "exception": "TypeError"}
+        ]
+      }
+    ]
+  },
+  "limits": {
+    "model_timeout_seconds": 300,
+    "oracle_timeout_seconds": 10,
+    "maximum_event_bytes": 4194304,
+    "maximum_changed_files": 2
+  }
+}

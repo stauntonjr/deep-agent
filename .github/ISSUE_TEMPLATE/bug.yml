@@ -1,0 +1,64 @@
+name: Defect
+description: Report incorrect behavior with a reproducible oracle
+title: "[Bug] "
+labels: ["type:bug", "evidence:required"]
+body:
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior and governing contract
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction and evidence
+      description: Provide deterministic steps, inputs, revision, and failure signature.
+    validations:
+      required: true
+  - type: textarea
+    id: escaped
+    attributes:
+      label: Escaped-defect analysis
+      description: Which existing control failed to prevent or detect this?
+  - type: textarea
+    id: in_scope
+    attributes:
+      label: Repair in scope
+      description: Enumerate the behavior and failure boundary this defect repair must address.
+    validations:
+      required: true
+  - type: textarea
+    id: out_of_scope
+    attributes:
+      label: Explicitly out of scope
+      description: Enumerate adjacent failures, threat actors, platforms, and redesigns this repair will not address.
+    validations:
+      required: true
+  - type: textarea
+    id: assurance_boundary
+    attributes:
+      label: Threat and assurance boundary
+      description: State the environment and adversarial assumptions under which the repair must hold.
+    validations:
+      required: true
+  - type: textarea
+    id: budget_constraints
+    attributes:
+      label: Complexity and budget constraints
+      description: State the permitted repair complexity, dependencies, time/token budget, and verification depth.
+    validations:
+      required: true
+  - type: textarea
+    id: scope_revision_triggers
+    attributes:
+      label: Conditions requiring scope revision
+      description: List discoveries that require build/adopt/adapt/defer reassessment, a new Issue, or owner review.
+    validations:
+      required: true

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/agentic-project-template/model-stress.schema.json",
+  "title": "Model stress policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "authority", "canary", "triggers", "execution", "required_evidence"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "authority": {"const": "supplemental"},
+    "canary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "provider", "model"],
+      "properties": {
+        "family": {"const": "qwen-coder"},
+        "provider": {"const": "runtime-selected"},
+        "model": {"const": "runtime-selected"}
+      }
+    },
+    "triggers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maximum_reported_loops_between_runs", "release_impacts", "path_prefixes"],
+      "properties": {
+        "maximum_reported_loops_between_runs": {"const": 10},
+        "release_impacts": {"const": ["minor", "major"]},
+        "path_prefixes": {"const": [".agents/skills/", ".pi/", "harness/adapters/", "harness/loops/", "harness/roles/", "tools/loop.py"]}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lanes", "minimum_trials_for_acceptance", "disposable_repository", "network_writes", "raw_transcript_retention", "model_self_approval"],
+      "properties": {
+        "lanes": {"const": ["bare", "harness"]},
+        "minimum_trials_for_acceptance": {"const": 3},
+        "disposable_repository": {"const": true},
+        "network_writes": {"const": false},
+        "raw_transcript_retention": {"const": false},
+        "model_self_approval": {"const": false}
+      }
+    },
+    "required_evidence": {
+      "const": ["model", "provider", "pi_version", "serving_runtime", "serving_recipe", "task_id", "prompt_digest", "tool_set", "limits", "trial_count", "test_result", "scope_result", "tool_errors", "elapsed_seconds"]
+    }
+  }
+}

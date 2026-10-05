@@ -1,0 +1,94 @@
+{
+  "schema_version": "1.0",
+  "harness_version": "0.5.0",
+  "template_mode": true,
+  "project": {
+    "name": "TBD",
+    "summary": "TBD",
+    "lifecycle": "new",
+    "profile": "generic",
+    "status": "draft",
+    "repository": "OWNER/REPOSITORY"
+  },
+  "intent": {
+    "users": [],
+    "outcomes": [],
+    "success_metrics": [],
+    "in_scope": [],
+    "out_of_scope": []
+  },
+  "constraints": {
+    "security": ["No secrets in the repository"],
+    "data_classification": "TBD",
+    "deployment": "TBD",
+    "budget": "TBD",
+    "licenses": ["TBD"]
+  },
+  "engineering": {
+    "languages": [],
+    "build_commands": [],
+    "test_commands": ["python3 -m unittest discover -s tests -v"],
+    "command_contract": {
+      "primary_check": "make smoke",
+      "bootstrap": "TBD",
+      "format_check": "TBD",
+      "lint": "TBD",
+      "typecheck": "TBD",
+      "unit": "python3 -m unittest discover -s tests -v",
+      "integration": "TBD",
+      "package_smoke": "TBD"
+    },
+    "quality": {
+      "dependency_lock": "required-if-dependencies",
+      "coverage_policy": "ratchet-or-explicit-exception",
+      "required_checks": ["format_check", "lint", "unit"],
+      "property_testing": "profile-selected"
+    },
+    "versioning": {
+      "strategy": "TBD",
+      "current": "TBD",
+      "public_contract": [],
+      "source": "TBD",
+      "tag_prefix": "v",
+      "pre_1_0_policy": "breaking-changes-bump-minor",
+      "release_notes": "CHANGELOG.md"
+    },
+    "architecture_changes_require_adr": true,
+    "public_interface_acceptance_required": true
+  },
+  "autonomy": {
+    "level": "supervised",
+    "network_writes": "explicit-human-approval",
+    "destructive_actions": "explicit-human-approval",
+    "release": "human-only",
+    "policy_changes": "human-review"
+  },
+  "sources_of_truth": [
+    {"rank": 1, "source": "accepted ADRs", "scope": "durable architecture decisions"},
+    {"rank": 2, "source": "code and schemas", "scope": "implemented behavior"},
+    {"rank": 3, "source": "tests and check evidence", "scope": "verified behavior"},
+    {"rank": 4, "source": "GitHub Issues", "scope": "accepted work and acceptance criteria"},
+    {"rank": 5, "source": "GitHub Project", "scope": "operational planning view"},
+    {"rank": 6, "source": "handoff and reports", "scope": "orientation and derived status"}
+  ],
+  "github": {
+    "issues_are_canonical_work_items": true,
+    "project_enabled": true,
+    "planning_contract": ".github/planning.json",
+    "security": {
+      "dependency_updates": "dependabot",
+      "dependency_review": "required",
+      "code_scanning": "codeql",
+      "secret_scanning": "required",
+      "push_protection": "required",
+      "workflow_permissions": "least-privilege",
+      "action_pinning": "full-commit-sha"
+    }
+  },
+  "open_questions": [
+    "Who are the primary users?",
+    "What measurable outcome defines the first useful release?",
+    "What data, security, and deployment constraints apply?"
+  ],
+  "decisions": []
+}

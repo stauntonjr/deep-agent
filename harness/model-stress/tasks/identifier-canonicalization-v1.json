@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.1",
+  "id": "identifier-canonicalization-v1",
+  "task_class": "implementation",
+  "prompt": "Implement canonical_identifier(value) in identifier.py. The function must require a string, apply Unicode casefolding, replace each run of one or more non-alphanumeric characters with one ASCII hyphen, remove leading and trailing hyphens, preserve casefolded Unicode letters and digits, and raise ValueError when no alphanumeric character remains. Do not change any other file.",
+  "initial_files": [
+    {
+      "path": "TASK.md",
+      "content": "# Task\n\nImplement `canonical_identifier(value)` in `identifier.py`.\n\nRequirements:\n\n- require `value` to be a string and raise `TypeError` otherwise;\n- apply Unicode casefolding before normalization;\n- replace every run of one or more non-alphanumeric characters with one ASCII hyphen;\n- remove leading and trailing hyphens;\n- preserve casefolded Unicode letters and digits;\n- raise `ValueError` if no alphanumeric character remains;\n- edit only `identifier.py`.\n"
+    },
+    {
+      "path": "identifier.py",
+      "content": "\"\"\"Identifier normalization.\"\"\"\n\n\ndef canonical_identifier(value: str) -> str:\n    \"\"\"Return the canonical identifier required by TASK.md.\"\"\"\n    return value.lower().replace(\" \" , \"-\")\n"
+    }
+  ],
+  "writable_paths": ["identifier.py"],
+  "oracle": {
+    "targets": [
+      {
+        "module": "identifier",
+        "function": "canonical_identifier",
+        "cases": [
+          {"id": "plain", "args": ["Alpha Beta"], "expected": "alpha-beta"},
+          {"id": "runs", "args": ["  Alpha___Beta...42  "], "expected": "alpha-beta-42"},
+          {"id": "casefold", "args": ["Straße"], "expected": "strasse"},
+          {"id": "unicode", "args": ["CAFÉ déjà"], "expected": "café-déjà"},
+          {"id": "digits", "args": ["版本 ２"], "expected": "版本-２"}
+        ],
+        "raises": [
+          {"id": "empty", "args": ["---___..."], "exception": "ValueError"},
+          {"id": "wrong-type", "args": [42], "exception": "TypeError"}
+        ]
+      }
+    ]
+  },
+  "limits": {
+    "model_timeout_seconds": 300,
+    "oracle_timeout_seconds": 10,
+    "maximum_event_bytes": 4194304,
+    "maximum_changed_files": 1
+  }
+}

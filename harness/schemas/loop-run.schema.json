@@ -1,0 +1,545 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Engineering loop run",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "revision",
+    "attempt_id",
+    "retry_policy",
+    "objective_seed",
+    "objective",
+    "acceptance_criteria",
+    "scope_contract",
+    "solution_assessments",
+    "declared_write_set",
+    "implementers",
+    "baseline",
+    "started_at",
+    "start_commit",
+    "state",
+    "checks",
+    "review_cycles",
+    "verdicts",
+    "release_impact"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.4"},
+    "run_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "revision": {"type": "integer", "minimum": 1},
+    "attempt_id": {"type": "integer", "minimum": 1},
+    "objective_seed": {"type": "string", "minLength": 1},
+    "objective": {"type": "string", "minLength": 1},
+    "acceptance_criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/criterion"}
+    },
+    "scope_contract": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/scopeContract"}
+      ]
+    },
+    "solution_assessments": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/solutionAssessment"}
+    },
+    "declared_write_set": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/writeScope"}
+    },
+    "implementers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "baseline": {
+      "type": "object",
+      "required": ["captured_at", "entries"],
+      "properties": {
+        "captured_at": {"type": "string"},
+        "entries": {"type": "array", "items": {"$ref": "#/$defs/snapshotEntry"}}
+      }
+    },
+    "state": {
+      "enum": [
+        "intake",
+        "understand",
+        "plan",
+        "authorize",
+        "implement",
+        "verify",
+        "adversarial-review",
+        "proportionality-review",
+        "integrate",
+        "report",
+        "learn",
+        "reported",
+        "blocked",
+        "abandoned"
+      ]
+    },
+    "checks": {"type": "array", "items": {"$ref": "#/$defs/check"}},
+    "review_cycles": {"type": "array", "items": {"$ref": "#/$defs/reviewCycle"}},
+    "verdicts": {"type": "array", "items": {"$ref": "#/$defs/verdict"}},
+    "release_impact": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/releaseImpact"}
+      ]
+    },
+    "agent_handoffs": {"type": "array"},
+    "attempt_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["revision", "attempt_id", "ended_at", "reason", "outcome"],
+        "properties": {
+          "revision": {"type": "integer", "minimum": 1},
+          "attempt_id": {"type": "integer", "minimum": 1},
+          "ended_at": {"type": "string"},
+          "reason": {"type": "string", "minLength": 1},
+          "outcome": {"const": "failed"}
+        }
+      }
+    },
+    "retry_policy": {
+      "type": "object",
+      "required": ["maximum_consecutive_failures", "on_exhaustion"],
+      "properties": {
+        "maximum_consecutive_failures": {"type": "integer", "minimum": 1},
+        "on_exhaustion": {"const": "stop-and-escalate"}
+      }
+    },
+    "decisions": {"type": "array"},
+    "risks": {"type": "array"}
+  },
+  "$defs": {
+    "nonemptyUniqueText": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "scopeContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "in_scope",
+        "out_of_scope",
+        "assurance_boundary",
+        "budget_constraints",
+        "revision_triggers"
+      ],
+      "properties": {
+        "in_scope": {"$ref": "#/$defs/nonemptyUniqueText"},
+        "out_of_scope": {"$ref": "#/$defs/nonemptyUniqueText"},
+        "assurance_boundary": {"type": "string", "minLength": 1},
+        "budget_constraints": {"$ref": "#/$defs/nonemptyUniqueText"},
+        "revision_triggers": {"$ref": "#/$defs/nonemptyUniqueText"}
+      }
+    },
+    "solutionAssessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "assessment_id",
+        "revision",
+        "attempt_id",
+        "trigger",
+        "disposition",
+        "research_status",
+        "rationale",
+        "sources",
+        "supersedes",
+        "superseded_by",
+        "candidate",
+        "recorded_at"
+      ],
+      "properties": {
+        "assessment_id": {"type": "string", "pattern": "^solution-[0-9]{3}$"},
+        "revision": {"type": "integer", "minimum": 1},
+        "attempt_id": {"type": "integer", "minimum": 1},
+        "trigger": {
+          "enum": [
+            "initial",
+            "standardized-capability",
+            "security-sensitive-capability",
+            "new-parser",
+            "sandbox",
+            "protocol",
+            "cryptography",
+            "concurrency-control",
+            "filesystem-security",
+            "material-dependency",
+            "write-scope-growth",
+            "threat-model-expansion",
+            "budget-risk"
+          ]
+        },
+        "disposition": {"enum": ["build", "adopt", "adapt", "defer"]},
+        "research_status": {"enum": ["not-material", "completed", "blocked"]},
+        "rationale": {"type": "string", "minLength": 1},
+        "sources": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "supersedes": {
+          "type": ["string", "null"],
+          "pattern": "^solution-[0-9]{3}$"
+        },
+        "superseded_by": {
+          "type": ["string", "null"],
+          "pattern": "^solution-[0-9]{3}$"
+        },
+        "candidate": {"$ref": "#/$defs/candidate"},
+        "recorded_at": {"type": "string"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"research_status": {"const": "completed"}}},
+          "then": {"properties": {"sources": {"minItems": 1}}}
+        }
+      ]
+    },
+    "criterion": {
+      "type": "object",
+      "required": ["id", "text", "waiver"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._-]{0,63}$"},
+        "text": {"type": "string", "minLength": 1},
+        "waiver": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "required": ["by", "reason", "revision", "recorded_at"]
+            }
+          ]
+        }
+      }
+    },
+    "writeScope": {
+      "type": "object",
+      "required": ["mode", "path"],
+      "properties": {
+        "mode": {"enum": ["exact", "prefix"]},
+        "path": {"type": "string", "minLength": 1}
+      }
+    },
+    "snapshotEntry": {
+      "type": "object",
+      "required": ["path", "status", "kind", "digest", "index", "index_flags"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "status": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["file", "symlink", "directory", "gitlink", "nested-repository", "other", "absent"]},
+        "digest": {"type": ["string", "null"]},
+        "index": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["mode", "object_id", "stage", "path"]
+          }
+        },
+        "index_flags": {
+          "type": "array",
+          "items": {"enum": ["assume-unchanged", "skip-worktree"]},
+          "uniqueItems": true
+        }
+      }
+    },
+    "check": {
+      "type": "object",
+      "required": [
+        "check_id",
+        "revision",
+        "attempt_id",
+        "criterion_ids",
+        "name",
+        "command",
+        "status",
+        "evidence",
+        "tier",
+        "duration_seconds",
+        "evidence_origin",
+        "reuse_source",
+        "artifact_digest",
+        "applicability",
+        "candidate",
+        "recorded_at"
+      ],
+      "properties": {
+        "status": {"enum": ["passed", "failed", "skipped", "not-run"]},
+        "criterion_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "tier": {"enum": ["static", "targeted", "affected", "full", "external"]},
+        "duration_seconds": {"type": "number", "minimum": 0},
+        "evidence_origin": {"enum": ["executed", "reused"]},
+        "reuse_source": {"type": ["string", "null"]},
+        "artifact_digest": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+          ]
+        },
+        "applicability": {"type": ["string", "null"]},
+        "candidate": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/candidate"}
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"evidence_origin": {"const": "reused"}}},
+          "then": {
+            "properties": {
+              "tier": {"not": {"const": "full"}},
+              "reuse_source": {"type": "string", "minLength": 1},
+              "artifact_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+              "applicability": {"type": "string", "minLength": 1}
+            }
+          },
+          "else": {
+            "properties": {
+              "reuse_source": {"const": null},
+              "artifact_digest": {"const": null},
+              "applicability": {"const": null}
+            }
+          }
+        }
+      ]
+    },
+    "reviewCycle": {
+      "type": "object",
+      "required": [
+        "review_id",
+        "revision",
+        "attempt_id",
+        "reviewer",
+        "candidate",
+        "started_at",
+        "closed_at",
+        "duration_seconds",
+        "status",
+        "outcome",
+        "summary",
+        "findings",
+        "proportionality",
+        "resolution"
+      ],
+      "properties": {
+        "review_id": {"type": "string", "pattern": "^review-[0-9]{3}$"},
+        "revision": {"type": "integer", "minimum": 1},
+        "attempt_id": {"type": "integer", "minimum": 1},
+        "reviewer": {"type": "string", "minLength": 1},
+        "candidate": {"$ref": "#/$defs/candidate"},
+        "started_at": {"type": "string"},
+        "closed_at": {"type": ["string", "null"]},
+        "duration_seconds": {"type": ["number", "null"], "minimum": 0},
+        "status": {"enum": ["open", "closed"]},
+        "outcome": {"type": ["string", "null"], "enum": [null, "clean", "batch-ready", "emergency-stop"]},
+        "summary": {"type": ["string", "null"]},
+        "findings": {"type": "array", "items": {"$ref": "#/$defs/finding"}},
+        "proportionality": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/proportionalityReview"}
+          ]
+        },
+        "resolution": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/findingBatchResolution"}
+          ]
+        },
+        "closing_candidate": {"$ref": "#/$defs/candidate"},
+        "candidate_changed": {"type": "boolean"}
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": [
+        "finding_id",
+        "severity",
+        "title",
+        "criterion",
+        "reproduction",
+        "minimum_repair",
+        "emergency_boundary",
+        "fingerprint",
+        "disposition",
+        "recorded_at"
+      ],
+      "properties": {
+        "finding_id": {"type": "string", "minLength": 1},
+        "severity": {"enum": ["low", "medium", "high", "critical"]},
+        "title": {"type": "string", "minLength": 1},
+        "criterion": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._-]{0,63}$"},
+        "reproduction": {"type": "string", "minLength": 1},
+        "minimum_repair": {"type": "string", "minLength": 1},
+        "emergency_boundary": {
+          "type": ["string", "null"],
+          "enum": [null, "secret-exposure", "destructive-effect", "uncontrolled-external-effect"]
+        },
+        "fingerprint": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "disposition": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/findingDisposition"}
+          ]
+        },
+        "recorded_at": {"type": "string"}
+      }
+    },
+    "findingDisposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision", "rationale", "decided_by", "recorded_at"],
+      "properties": {
+        "decision": {
+          "enum": [
+            "repair-in-scope",
+            "simplify",
+            "narrow-claim",
+            "defer",
+            "accept-risk",
+            "revise-contract",
+            "emergency-stop"
+          ]
+        },
+        "rationale": {"type": "string", "minLength": 1},
+        "decided_by": {"type": "string", "minLength": 1},
+        "recorded_at": {"type": "string"}
+      }
+    },
+    "proportionalityReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reviewed_by",
+        "independent_required",
+        "objective_alignment",
+        "scope_change",
+        "complexity_change",
+        "budget_status",
+        "triggers",
+        "alternatives",
+        "recommendation",
+        "solution_disposition",
+        "rationale",
+        "candidate",
+        "recorded_at"
+      ],
+      "properties": {
+        "reviewed_by": {"type": "string", "minLength": 1},
+        "independent_required": {"type": "boolean"},
+        "objective_alignment": {"type": "string", "minLength": 1},
+        "scope_change": {"enum": ["none", "within-contract", "expands-contract"]},
+        "complexity_change": {"enum": ["none", "reduced", "bounded", "material"]},
+        "budget_status": {"enum": ["on-budget", "at-risk", "exceeded", "unavailable"]},
+        "triggers": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "standardized-capability",
+              "security-sensitive-capability",
+              "new-parser",
+              "sandbox",
+              "protocol",
+              "cryptography",
+              "concurrency-control",
+              "filesystem-security",
+              "material-dependency",
+              "write-scope-growth",
+              "threat-model-expansion",
+              "budget-risk"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "alternatives": {"$ref": "#/$defs/nonemptyUniqueText"},
+        "recommendation": {
+          "enum": ["proceed", "simplify", "defer", "revise-contract", "escalate-to-owner"]
+        },
+        "solution_disposition": {"enum": ["build", "adopt", "adapt", "defer"]},
+        "rationale": {"type": "string", "minLength": 1},
+        "candidate": {"$ref": "#/$defs/candidate"},
+        "recorded_at": {"type": "string"}
+      }
+    },
+    "findingBatchResolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decision",
+        "next_transition",
+        "resolved_by",
+        "rationale",
+        "candidate",
+        "recorded_at"
+      ],
+      "properties": {
+        "decision": {"enum": ["risk-accepted", "deferred", "emergency-stopped"]},
+        "next_transition": {"enum": ["none", "new-attempt", "contract-revision"]},
+        "resolved_by": {"type": "string", "minLength": 1},
+        "rationale": {"type": "string", "minLength": 1},
+        "candidate": {"$ref": "#/$defs/candidate"},
+        "recorded_at": {"type": "string"}
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "required": ["commit", "tree_digest", "release_impact_digest"],
+      "properties": {
+        "commit": {"type": "string"},
+        "tree_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "release_impact_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "required": [
+        "verdict_id",
+        "revision",
+        "attempt_id",
+        "reviewer",
+        "decision",
+        "criterion_ids",
+        "evidence",
+        "candidate",
+        "recorded_at"
+      ],
+      "properties": {
+        "decision": {"enum": ["approve", "revise", "reject"]},
+        "review_id": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^review-[0-9]{3}$"}
+          ]
+        },
+        "candidate": {"$ref": "#/$defs/candidate"}
+      }
+    },
+    "releaseImpact": {
+      "type": "object",
+      "required": [
+        "revision",
+        "attempt_id",
+        "level",
+        "reason",
+        "public_contract_changes",
+        "recorded_at"
+      ],
+      "properties": {
+        "revision": {"type": "integer", "minimum": 1},
+        "attempt_id": {"type": "integer", "minimum": 1},
+        "level": {"enum": ["none", "patch", "minor", "major"]},
+        "reason": {"type": "string", "minLength": 1},
+        "public_contract_changes": {"type": "array", "items": {"type": "string"}},
+        "recorded_at": {"type": "string"}
+      }
+    }
+  }
+}

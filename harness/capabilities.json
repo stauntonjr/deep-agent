@@ -1,0 +1,556 @@
+{
+  "schema_version": "1.0",
+  "policy": {
+    "default_status": "inactive",
+    "activation_authority": "human-owner",
+    "planning_dispositions": [
+      "use-active",
+      "propose-activation",
+      "not-applicable"
+    ],
+    "duplicate_rule": "A claimed responsibility belongs to its catalog capability even while inactive. Extend, activate, or explicitly supersede that capability instead of creating an independent implementation."
+  },
+  "capabilities": [
+    {
+      "id": "python-architecture-analysis",
+      "aliases": [
+        "architecture-map",
+        "ast-inventory",
+        "dependency-map",
+        "loc-accounting"
+      ],
+      "status": "inactive",
+      "purpose": "Generate a reviewable Python architecture inventory, dependency graph, AST-span LOC metrics, and drift check.",
+      "source_projects": [
+        {
+          "name": "S3NTINEL",
+          "repository": "https://github.com/stauntonjr/S3NTINEL",
+          "observed_commit": "072f322314f5",
+          "paths": [
+            "tools/repo_schematic.py",
+            "tools/module_deps.py",
+            "tools/architecture_workflow.py",
+            "docs/architecture/architecture_metrics.md"
+          ]
+        }
+      ],
+      "consider_when": [
+        "The Python package has enough modules that ownership or dependency direction is difficult to inspect manually.",
+        "Architecture documentation is drifting from code.",
+        "LOC, module skew, or dependency evidence would materially improve a refactor decision."
+      ],
+      "activate_when": [
+        "The owner accepts the generated-artifact boundary and names the Python source roots to analyze."
+      ],
+      "claimed_responsibilities": [
+        "architecture.python.ast-inventory",
+        "architecture.python.dependency-graph",
+        "architecture.python.loc-metrics",
+        "architecture.python.drift-check"
+      ],
+      "activation_requires": [
+        "Explicit human approval.",
+        "Project-specific include and exclude roots.",
+        "One deterministic render-and-check command."
+      ],
+      "inactive_contract": {
+        "runtime_dependencies": [],
+        "ci_checks": [],
+        "implementation_paths": []
+      }
+    },
+    {
+      "id": "computational-complexity-review",
+      "aliases": [
+        "complexity-analysis",
+        "time-space-review"
+      ],
+      "status": "inactive",
+      "purpose": "Document workload-specific time and space complexity for important execution paths without pretending a generic static score proves runtime behavior.",
+      "source_projects": [
+        {
+          "name": "S3NTINEL",
+          "repository": "https://github.com/stauntonjr/S3NTINEL",
+          "observed_commit": "072f322314f5",
+          "paths": [
+            "docs/current/computational_complexity_report.md"
+          ]
+        }
+      ],
+      "consider_when": [
+        "A pipeline is producing enough data that asymptotic or memory behavior affects feasibility.",
+        "A performance decision needs an explicit workload and algorithm model."
+      ],
+      "activate_when": [
+        "Representative workloads and the critical algorithms are known well enough to support a reviewable analysis."
+      ],
+      "claimed_responsibilities": [
+        "architecture.workload.time-complexity",
+        "architecture.workload.space-complexity"
+      ],
+      "activation_requires": [
+        "Explicit human approval.",
+        "Named workload assumptions and measured evidence where available."
+      ],
+      "inactive_contract": {
+        "runtime_dependencies": [],
+        "ci_checks": [],
+        "implementation_paths": []
+      }
+    },
+    {
+      "id": "product-validation-challenges",
+      "aliases": [
+        "known-bad-corpus",
+        "validation-harness"
+      ],
+      "status": "inactive",
+      "purpose": "Turn observed product failures and known-bad examples into a small deterministic challenge corpus once product outputs exist.",
+      "source_projects": [
+        {
+          "name": "S3NTINEL",
+          "repository": "https://github.com/stauntonjr/S3NTINEL",
+          "observed_commit": "072f322314f5",
+          "paths": [
+            "tests/",
+            "docs/"
+          ]
+        }
+      ],
+      "consider_when": [
+        "The product emits results with stable correctness criteria.",
+        "A real escaped defect or representative known-bad case can be replayed deterministically."
+      ],
+      "activate_when": [
+        "At least one product result and its oracle are stable enough to preserve without synthetic test inflation."
+      ],
+      "claimed_responsibilities": [
+        "validation.product.challenge-corpus",
+        "validation.product.escaped-defect-replay"
+      ],
+      "activation_requires": [
+        "Explicit human approval.",
+        "A bounded oracle and retention rule.",
+        "Focused checks tied to real product behavior."
+      ],
+      "inactive_contract": {
+        "runtime_dependencies": [],
+        "ci_checks": [],
+        "implementation_paths": []
+      }
+    },
+    {
+      "id": "durable-project-memory",
+      "aliases": [
+        "artifact-memory",
+        "chat-memory",
+        "directive-memory"
+      ],
+      "status": "inactive",
+      "purpose": "Persist reviewable chat, artifact, directive, and retrieval records behind explicit contracts and writeback boundaries.",
+      "source_projects": [
+        {
+          "name": "Kortex",
+          "repository": "https://github.com/stauntonjr/kortex",
+          "observed_commit": "49a16874b44f",
+          "paths": [
+            "kortex/contracts.py",
+            "memory/chat_ingest.py",
+            "memory/retrieval.py",
+            "memory/writeback.py"
+          ]
+        }
+      ],
+      "consider_when": [
+        "Project continuity cannot be maintained reliably through checked-in specifications and handoffs alone.",
+        "Chat, artifacts, or directives need durable retrieval with provenance."
+      ],
+      "activate_when": [
+        "The project has a concrete memory consumer, retention policy, authority model, and inspectable writeback contract."
+      ],
+      "claimed_responsibilities": [
+        "memory.project.chat-writeback",
+        "memory.project.artifact-retrieval",
+        "memory.project.directive-retention"
+      ],
+      "activation_requires": [
+        "Explicit human approval.",
+        "Data classification, retention, deletion, and provenance decisions.",
+        "A demonstrated consumer that cannot be served by repository artifacts alone."
+      ],
+      "inactive_contract": {
+        "runtime_dependencies": [],
+        "ci_checks": [],
+        "implementation_paths": []
+      }
+    },
+    {
+      "id": "governed-reflection",
+      "aliases": [
+        "directive-promotion",
+        "reflection-jobs"
+      ],
+      "status": "inactive",
+      "purpose": "Queue reviewable reflection work such as session compaction, directive extraction, preference promotion, and link repair without silently changing project policy.",
+      "source_projects": [
+        {
+          "name": "Kortex",
+          "repository": "https://github.com/stauntonjr/kortex",
+          "observed_commit": "49a16874b44f",
+          "paths": [
+            "kortex/contracts.py",
+            "memory/service.py",
+            "memory/writeback.py"
+          ]
+        }
+      ],
+      "consider_when": [
+        "Durable memory exists and repeated observations need deliberate review or promotion.",
+        "Automated summarization risks turning an observation into an unreviewed directive."
+      ],
+      "activate_when": [
+        "Durable project memory is active and promotion decisions have a named reviewer and audit trail."
+      ],
+      "claimed_responsibilities": [
+        "memory.project.reflection-queue",
+        "memory.project.directive-promotion"
+      ],
+      "activation_requires": [
+        "Explicit human approval.",
+        "Active durable-project-memory capability.",
+        "Review and rollback rules for promoted knowledge."
+      ],
+      "inactive_contract": {
+        "runtime_dependencies": [],
+        "ci_checks": [],
+        "implementation_paths": []
+      }
+    },
+    {
+      "id": "semantic-evidence-ledger",
+      "aliases": [
+        "assertion-ledger",
+        "evidence-challenges",
+        "governed-assertions"
+      ],
+      "status": "inactive",
+      "purpose": "Preserve append-oriented source assertions, provenance, challenges, and deterministic resolution instead of overwriting evidence with a canonical projection.",
+      "source_projects": [
+        {
+          "name": "Procurement Intelligence Lab",
+          "repository": "https://github.com/stauntonjr/procurement-intelligence-lab",
+          "observed_commit": "0f9d1a45af07",
+          "paths": [
+            "docs/architecture/overview.md",
+            "docs/architecture/platform-semantics.md",
+            "docs/architecture/domain-package-and-stage-planning.md"
+          ]
+        }
+      ],
+      "consider_when": [
+        "Multiple sources can support, contradict, revise, or challenge a derived result.",
+        "A canonical answer must remain traceable to preserved assertions."
+      ],
+      "activate_when": [
+        "The domain has explicit assertion, evidence, challenge, and resolution semantics."
+      ],
+      "claimed_responsibilities": [
+        "evidence.semantic.append-only-assertions",
+        "evidence.semantic.challenge-records",
+        "evidence.semantic.canonical-projection"
+      ],
+      "activation_requires": [
+        "Explicit human approval.",
+        "Domain-specific assertion and resolution contracts.",
+        "A provenance-preserving storage design."
+      ],
+      "inactive_contract": {
+        "runtime_dependencies": [],
+        "ci_checks": [],
+        "implementation_paths": []
+      }
+    },
+    {
+      "id": "application-composition-root",
+      "aliases": [
+        "constructor-di",
+        "ports-and-adapters",
+        "visible-wiring"
+      ],
+      "status": "inactive",
+      "purpose": "Keep domain and application semantics independent of frameworks while one visible composition root wires ports to concrete adapters.",
+      "source_projects": [
+        {
+          "name": "Procurement Intelligence Lab",
+          "repository": "https://github.com/stauntonjr/procurement-intelligence-lab",
+          "observed_commit": "0f9d1a45af07",
+          "paths": [
+            "docs/architecture/overview.md",
+            "docs/adr/006-explicit-di.md"
+          ]
+        }
+      ],
+      "consider_when": [
+        "The same use cases will be exposed through more than one interface.",
+        "Database, model, search, or transport implementations should remain replaceable."
+      ],
+      "activate_when": [
+        "The first application use case and its required ports are known."
+      ],
+      "claimed_responsibilities": [
+        "architecture.application.use-cases",
+        "architecture.application.ports",
+        "architecture.application.adapter-wiring"
+      ],
+      "activation_requires": [
+        "Explicit human approval.",
+        "A named composition-root module.",
+        "Constructor injection without a service locator or import-time global wiring."
+      ],
+      "inactive_contract": {
+        "runtime_dependencies": [],
+        "ci_checks": [],
+        "implementation_paths": []
+      }
+    },
+    {
+      "id": "cli-interface",
+      "aliases": [
+        "command-line-adapter"
+      ],
+      "status": "inactive",
+      "purpose": "Expose application use cases through a thin command-line adapter that shares typed inputs and results with later interfaces.",
+      "source_projects": [
+        {
+          "name": "Procurement Intelligence Lab",
+          "repository": "https://github.com/stauntonjr/procurement-intelligence-lab",
+          "observed_commit": "0f9d1a45af07",
+          "paths": [
+            "docs/architecture/overview.md",
+            "docs/adr/011-read-only-evidence-inspector.md"
+          ]
+        }
+      ],
+      "consider_when": [
+        "A local deterministic interface is the fastest useful product boundary."
+      ],
+      "activate_when": [
+        "At least one application use case has a stable typed input and result."
+      ],
+      "claimed_responsibilities": [
+        "interface.cli.command-adapter"
+      ],
+      "activation_requires": [
+        "Explicit human approval.",
+        "A public CLI acceptance check."
+      ],
+      "inactive_contract": {
+        "runtime_dependencies": [],
+        "ci_checks": [],
+        "implementation_paths": []
+      }
+    },
+    {
+      "id": "http-api-interface",
+      "aliases": [
+        "api-adapter",
+        "http-adapter"
+      ],
+      "status": "inactive",
+      "purpose": "Expose existing application use cases through a thin HTTP adapter without moving semantics into the web framework.",
+      "source_projects": [
+        {
+          "name": "Procurement Intelligence Lab",
+          "repository": "https://github.com/stauntonjr/procurement-intelligence-lab",
+          "observed_commit": "0f9d1a45af07",
+          "paths": [
+            "docs/architecture/overview.md",
+            "docs/adr/011-read-only-evidence-inspector.md"
+          ]
+        }
+      ],
+      "consider_when": [
+        "A network client needs a use case already proven through the CLI."
+      ],
+      "activate_when": [
+        "The CLI-backed application result contract is stable and an HTTP consumer is identified."
+      ],
+      "claimed_responsibilities": [
+        "interface.http.request-adapter"
+      ],
+      "activation_requires": [
+        "Explicit human approval.",
+        "An HTTP contract and end-to-end acceptance check."
+      ],
+      "inactive_contract": {
+        "runtime_dependencies": [],
+        "ci_checks": [],
+        "implementation_paths": []
+      }
+    },
+    {
+      "id": "mcp-interface",
+      "aliases": [
+        "mcp-adapter",
+        "model-context-protocol-interface"
+      ],
+      "status": "inactive",
+      "purpose": "Expose proven application use cases as MCP tools or resources while preserving the common application layer and its authority boundaries.",
+      "source_projects": [
+        {
+          "name": "Procurement Intelligence Lab",
+          "repository": "https://github.com/stauntonjr/procurement-intelligence-lab",
+          "observed_commit": "0f9d1a45af07",
+          "paths": [
+            "docs/architecture/overview.md"
+          ]
+        }
+      ],
+      "consider_when": [
+        "An external agent needs a stable application capability rather than direct database or model access."
+      ],
+      "activate_when": [
+        "The underlying use case is proven and an MCP consumer, tool contract, and authority boundary are explicit."
+      ],
+      "claimed_responsibilities": [
+        "interface.mcp.tool-resource-adapter"
+      ],
+      "activation_requires": [
+        "Explicit human approval.",
+        "A versioned MCP contract and end-to-end client check."
+      ],
+      "inactive_contract": {
+        "runtime_dependencies": [],
+        "ci_checks": [],
+        "implementation_paths": []
+      }
+    },
+    {
+      "id": "web-interface",
+      "aliases": [
+        "browser-ui",
+        "web-ui-adapter"
+      ],
+      "status": "inactive",
+      "purpose": "Add a small web interface over proven application use cases without creating an independent domain implementation.",
+      "source_projects": [
+        {
+          "name": "Procurement Intelligence Lab",
+          "repository": "https://github.com/stauntonjr/procurement-intelligence-lab",
+          "observed_commit": "0f9d1a45af07",
+          "paths": [
+            "docs/architecture/overview.md",
+            "docs/adr/011-read-only-evidence-inspector.md"
+          ]
+        }
+      ],
+      "consider_when": [
+        "Users need interactive inspection after the CLI and shared result contracts are stable."
+      ],
+      "activate_when": [
+        "A specific user workflow cannot be served adequately by the CLI or API alone."
+      ],
+      "claimed_responsibilities": [
+        "interface.web.presentation-adapter"
+      ],
+      "activation_requires": [
+        "Explicit human approval.",
+        "A bounded workflow and browser-level acceptance check."
+      ],
+      "inactive_contract": {
+        "runtime_dependencies": [],
+        "ci_checks": [],
+        "implementation_paths": []
+      }
+    },
+    {
+      "id": "point-in-time-provenance",
+      "aliases": [
+        "as-of-snapshots",
+        "event-time-envelope",
+        "revision-chain"
+      ],
+      "status": "inactive",
+      "purpose": "Keep effective time, publication time, receipt time, source identity, checksum, and revision ancestry distinct so replay cannot introduce look-ahead.",
+      "source_projects": [
+        {
+          "name": "Macro Technical Pulse",
+          "repository": "https://github.com/stauntonjr/macro-technical-pulse",
+          "observed_commit": "7ce73f1b2dd0",
+          "paths": [
+            "docs/architecture.md",
+            "docs/decisions/0007-event-time-pulse-model.md",
+            "src/macro_technical_pulse/artifact_chain.py"
+          ]
+        }
+      ],
+      "consider_when": [
+        "Sources arrive asynchronously, can be corrected, or are evaluated as of historical cutoffs.",
+        "A later result must prove exactly which source version was available."
+      ],
+      "activate_when": [
+        "The domain has mutable or revised sources and an explicit as-of query or replay requirement."
+      ],
+      "claimed_responsibilities": [
+        "provenance.event.effective-time",
+        "provenance.event.publication-time",
+        "provenance.event.receipt-time",
+        "provenance.event.revision-chain",
+        "provenance.artifact.checksum-chain"
+      ],
+      "activation_requires": [
+        "Explicit human approval.",
+        "Source-specific time and revision semantics.",
+        "Cutoff and replay acceptance examples."
+      ],
+      "inactive_contract": {
+        "runtime_dependencies": [],
+        "ci_checks": [],
+        "implementation_paths": []
+      }
+    },
+    {
+      "id": "role-separated-analysis",
+      "aliases": [
+        "parallel-domain-roles",
+        "structured-role-handoffs"
+      ],
+      "status": "inactive",
+      "purpose": "Split genuinely independent domain analysis across bounded roles with structured artifacts and independent approval where correlated error matters.",
+      "source_projects": [
+        {
+          "name": "Macro Technical Pulse",
+          "repository": "https://github.com/stauntonjr/macro-technical-pulse",
+          "observed_commit": "7ce73f1b2dd0",
+          "paths": [
+            "docs/roles.md",
+            "docs/decisions/0002-separate-agent-roles.md",
+            "docs/architecture.md"
+          ]
+        }
+      ],
+      "consider_when": [
+        "Three or more domain lanes can proceed independently and produce mergeable artifacts.",
+        "The author of an evaluation should not approve the resulting risk decision."
+      ],
+      "activate_when": [
+        "Parallel ownership materially shortens a real workflow and each lane has a disjoint write or artifact boundary."
+      ],
+      "claimed_responsibilities": [
+        "orchestration.domain.parallel-role-ownership",
+        "orchestration.domain.structured-handoffs",
+        "orchestration.domain.independent-approval"
+      ],
+      "activation_requires": [
+        "Explicit human approval.",
+        "Named roles, disjoint ownership, handoff schema, and stop conditions.",
+        "A demonstrated workload that benefits from parallelism."
+      ],
+      "inactive_contract": {
+        "runtime_dependencies": [],
+        "ci_checks": [],
+        "implementation_paths": []
+      }
+    }
+  ]
+}

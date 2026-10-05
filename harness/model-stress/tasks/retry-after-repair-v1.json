@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.1",
+  "id": "retry-after-repair-v1",
+  "task_class": "defect-repair",
+  "prompt": "Repair retry_delay(value, now_epoch) in retry_after.py. Follow TASK.md exactly, use only the Python standard library, and change no other file.",
+  "initial_files": [
+    {
+      "path": "TASK.md",
+      "content": "# Task\n\nRepair `retry_delay(value, now_epoch)` in `retry_after.py`.\n\nRequirements:\n\n- require `value` to be a string and `now_epoch` to be an integer other than `bool`;\n- trim surrounding whitespace from `value`;\n- accept non-negative decimal delay-seconds, including leading zeroes, and return an integer;\n- otherwise accept only an IMF-fixdate with the exact shape `Sun, 06 Nov 1994 08:49:37 GMT`;\n- for a date, return the non-negative whole-second difference from `now_epoch`, clamping a past date to zero;\n- raise `ValueError` for negative, empty, malformed, or non-IMF date values;\n- use only the Python standard library;\n- edit only `retry_after.py`.\n"
+    },
+    {
+      "path": "retry_after.py",
+      "content": "\"\"\"Retry-After parsing.\"\"\"\n\n\ndef retry_delay(value: str, now_epoch: int) -> int:\n    \"\"\"Return the delay represented by value.\"\"\"\n    return int(value)\n"
+    }
+  ],
+  "writable_paths": ["retry_after.py"],
+  "oracle": {
+    "targets": [
+      {
+        "module": "retry_after",
+        "function": "retry_delay",
+        "cases": [
+          {"id": "delta", "args": ["120", 0], "expected": 120},
+          {"id": "delta-trim-leading-zero", "args": [" 003 ", 0], "expected": 3},
+          {"id": "date-future", "args": ["Sun, 06 Nov 1994 08:49:37 GMT", 784111700], "expected": 77},
+          {"id": "date-exact", "args": ["Sun, 06 Nov 1994 08:49:37 GMT", 784111777], "expected": 0},
+          {"id": "date-past", "args": ["Sun, 06 Nov 1994 08:49:37 GMT", 784111800], "expected": 0}
+        ],
+        "raises": [
+          {"id": "negative", "args": ["-1", 0], "exception": "ValueError"},
+          {"id": "empty", "args": ["   ", 0], "exception": "ValueError"},
+          {"id": "non-padded-day", "args": ["Sun, 6 Nov 1994 08:49:37 GMT", 0], "exception": "ValueError"},
+          {"id": "weekday-mismatch", "args": ["Mon, 06 Nov 1994 08:49:37 GMT", 0], "exception": "ValueError"},
+          {"id": "wrong-zone", "args": ["Sun, 06 Nov 1994 08:49:37 UTC", 0], "exception": "ValueError"},
+          {"id": "malformed-date", "args": ["Sunday, 06-Nov-94 08:49:37 GMT", 0], "exception": "ValueError"},
+          {"id": "wrong-value-type", "args": [120, 0], "exception": "TypeError"},
+          {"id": "wrong-now-type", "args": ["1", true], "exception": "TypeError"}
+        ]
+      }
+    ]
+  },
+  "limits": {
+    "model_timeout_seconds": 300,
+    "oracle_timeout_seconds": 10,
+    "maximum_event_bytes": 4194304,
+    "maximum_changed_files": 1
+  }
+}

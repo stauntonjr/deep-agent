@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/agentic-project-template/model-stress-task.schema.json",
+  "title": "Held-out model-stress task",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "task_class", "prompt", "initial_files", "writable_paths", "oracle", "limits"],
+  "properties": {
+    "schema_version": {"const": "1.1"},
+    "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 80},
+    "task_class": {"enum": ["implementation", "defect-repair", "cross-file-integration"]},
+    "prompt": {"type": "string", "minLength": 1, "maxLength": 4000},
+    "initial_files": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "content"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1, "maxLength": 160},
+          "content": {"type": "string", "maxLength": 65536}
+        }
+      }
+    },
+    "writable_paths": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1, "maxLength": 160}
+    },
+    "oracle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["targets"],
+      "properties": {
+        "targets": {
+          "type": "array", "minItems": 1, "maxItems": 5,
+          "items": {"$ref": "#/$defs/oracle-target"}
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model_timeout_seconds", "oracle_timeout_seconds", "maximum_event_bytes", "maximum_changed_files"],
+      "properties": {
+        "model_timeout_seconds": {"type": "integer", "minimum": 30, "maximum": 900},
+        "oracle_timeout_seconds": {"type": "integer", "minimum": 1, "maximum": 30},
+        "maximum_event_bytes": {"type": "integer", "minimum": 65536, "maximum": 8388608},
+        "maximum_changed_files": {"type": "integer", "minimum": 1, "maximum": 5}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"id": {"const": "identifier-canonicalization-v1"}}, "required": ["id"]},
+      "then": {"properties": {"task_class": {"const": "implementation"}}}
+    },
+    {
+      "if": {"properties": {"id": {"const": "retry-after-repair-v1"}}, "required": ["id"]},
+      "then": {"properties": {"task_class": {"const": "defect-repair"}}}
+    },
+    {
+      "if": {"properties": {"id": {"const": "release-policy-integration-v1"}}, "required": ["id"]},
+      "then": {"properties": {"task_class": {"const": "cross-file-integration"}}}
+    }
+  ],
+  "$defs": {
+    "scalar": {"type": ["string", "number", "integer", "boolean", "null"]},
+    "oracle-target": {
+      "type": "object", "additionalProperties": false,
+      "required": ["module", "function", "cases", "raises"],
+      "properties": {
+        "module": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 80},
+        "function": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 80},
+        "cases": {
+          "type": "array", "maxItems": 50,
+          "items": {"$ref": "#/$defs/value-case"}
+        },
+        "raises": {
+          "type": "array", "maxItems": 50,
+          "items": {"$ref": "#/$defs/exception-case"}
+        }
+      },
+      "anyOf": [
+        {"properties": {"cases": {"minItems": 1}}},
+        {"properties": {"raises": {"minItems": 1}}}
+      ]
+    },
+    "value-case": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "args", "expected"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 80},
+        "args": {"type": "array", "maxItems": 8, "items": {"$ref": "#/$defs/scalar"}},
+        "expected": {"$ref": "#/$defs/return-value"}
+      }
+    },
+    "return-value": {
+      "oneOf": [
+        {"$ref": "#/$defs/scalar"},
+        {"type": "array", "maxItems": 8, "items": {"$ref": "#/$defs/scalar"}}
+      ]
+    },
+    "exception-case": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "args", "exception"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 80},
+        "args": {"type": "array", "maxItems": 8, "items": {"$ref": "#/$defs/scalar"}},
+        "exception": {"enum": ["TypeError", "ValueError"]}
+      }
+    }
+  }
+}

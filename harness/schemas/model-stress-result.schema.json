@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/agentic-project-template/model-stress-result.schema.json",
+  "title": "Sanitized paired model-stress result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "authority", "evidence_level", "accepted_baseline", "model_invoked", "provenance", "provider_boundary", "task", "limits", "trial_count", "lanes", "comparison"],
+  "properties": {
+    "schema_version": {"const": "1.3"},
+    "authority": {"const": "supplemental"},
+    "evidence_level": {"enum": ["smoke", "acceptance-candidate"]},
+    "accepted_baseline": {"const": false},
+    "model_invoked": {"const": true},
+    "provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["model", "provider", "pi_version", "serving_runtime", "serving_recipe", "endpoint_class"],
+      "properties": {
+        "model": {"type": "string", "minLength": 1, "maxLength": 512},
+        "provider": {"type": "string", "minLength": 1, "maxLength": 512},
+        "pi_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$", "maxLength": 512},
+        "serving_runtime": {"type": "string", "minLength": 1, "maxLength": 512},
+        "serving_recipe": {"type": "string", "minLength": 1, "maxLength": 512},
+        "endpoint_class": {"enum": ["local-loopback-openai-compatible", "credential-isolated-chatgpt-codex-subscription"]}
+      }
+    },
+    "provider_boundary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["execution_target", "reasoning_effort", "credential_delivery", "output_token_limit_enforcement", "maximum_requests", "maximum_request_bytes", "observed_requests", "observed_request_bytes"],
+      "properties": {
+        "execution_target": {"enum": ["local-qwen", "codex-subscription-sol"]},
+        "reasoning_effort": {"enum": ["not-applicable", "medium"]},
+        "credential_delivery": {"enum": ["synthetic-placeholder", "host-subscription-relay"]},
+        "output_token_limit_enforcement": {"enum": ["provider-request", "runner-config-only"]},
+        "maximum_requests": {"type": "integer", "minimum": 0, "maximum": 100},
+        "maximum_request_bytes": {"type": "integer", "minimum": 0, "maximum": 8388608},
+        "observed_requests": {"type": "integer", "minimum": 0, "maximum": 100},
+        "observed_request_bytes": {"type": "integer", "minimum": 0, "maximum": 8388608}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"execution_target": {"const": "local-qwen"}}, "required": ["execution_target"]},
+          "then": {
+            "properties": {
+              "reasoning_effort": {"const": "not-applicable"},
+              "credential_delivery": {"const": "synthetic-placeholder"},
+              "output_token_limit_enforcement": {"const": "provider-request"},
+              "maximum_requests": {"const": 0},
+              "maximum_request_bytes": {"const": 0},
+              "observed_requests": {"const": 0},
+              "observed_request_bytes": {"const": 0}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"execution_target": {"const": "codex-subscription-sol"}}, "required": ["execution_target"]},
+          "then": {
+            "properties": {
+              "reasoning_effort": {"const": "medium"},
+              "credential_delivery": {"const": "host-subscription-relay"},
+              "output_token_limit_enforcement": {"const": "runner-config-only"},
+              "maximum_requests": {"minimum": 1},
+              "maximum_request_bytes": {"minimum": 1024}
+            }
+          }
+        }
+      ]
+    },
+    "task": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "task_class", "task_digest", "prompt_digest", "tool_set", "oracle_case_count", "oracle_case_ids", "resource_bundle_digest", "writable_paths"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 80},
+        "task_class": {"enum": ["implementation", "defect-repair", "cross-file-integration"]},
+        "task_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "prompt_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "tool_set": {"const": ["read", "edit"]},
+        "oracle_case_count": {"type": "integer", "minimum": 1, "maximum": 70},
+        "oracle_case_ids": {
+          "type": "array", "minItems": 1, "maxItems": 70, "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 80}
+        },
+        "resource_bundle_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "writable_paths": {
+          "type": "array", "minItems": 1, "maxItems": 5, "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 160}
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"id": {"const": "identifier-canonicalization-v1"}}, "required": ["id"]},
+          "then": {"properties": {"task_class": {"const": "implementation"}}}
+        },
+        {
+          "if": {"properties": {"id": {"const": "retry-after-repair-v1"}}, "required": ["id"]},
+          "then": {"properties": {"task_class": {"const": "defect-repair"}}}
+        },
+        {
+          "if": {"properties": {"id": {"const": "release-policy-integration-v1"}}, "required": ["id"]},
+          "then": {"properties": {"task_class": {"const": "cross-file-integration"}}}
+        }
+      ]
+    },
+    "limits": {"$ref": "#/$defs/limits"},
+    "trial_count": {"type": "integer", "minimum": 1, "maximum": 10, "not": {"const": 2}},
+    "lanes": {
+      "type": "object", "additionalProperties": false, "required": ["bare", "harness"],
+      "properties": {"bare": {"$ref": "#/$defs/lane"}, "harness": {"$ref": "#/$defs/lane"}}
+    },
+    "comparison": {
+      "type": "object", "additionalProperties": false,
+      "required": ["bare_passed_trials", "harness_passed_trials", "observed_pass_difference", "general_harness_lift_claim"],
+      "properties": {
+        "bare_passed_trials": {"type": "integer", "minimum": 0},
+        "harness_passed_trials": {"type": "integer", "minimum": 0},
+        "observed_pass_difference": {"type": "integer"},
+        "general_harness_lift_claim": {"const": false}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "provider_boundary": {
+            "properties": {"execution_target": {"const": "codex-subscription-sol"}},
+            "required": ["execution_target"]
+          }
+        },
+        "required": ["provider_boundary"]
+      },
+      "then": {
+        "properties": {
+          "provenance": {
+            "properties": {
+              "model": {"const": "gpt-5.6-sol"},
+              "provider": {"const": "openai-codex"},
+              "endpoint_class": {"const": "credential-isolated-chatgpt-codex-subscription"}
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "limits": {
+      "type": "object", "additionalProperties": false,
+      "required": ["model_timeout_seconds", "oracle_timeout_seconds", "maximum_event_bytes", "maximum_changed_files", "maximum_output_tokens"],
+      "properties": {
+        "model_timeout_seconds": {"type": "integer", "minimum": 30, "maximum": 900},
+        "oracle_timeout_seconds": {"type": "integer", "minimum": 1, "maximum": 30},
+        "maximum_event_bytes": {"type": "integer", "minimum": 65536, "maximum": 8388608},
+        "maximum_changed_files": {"type": "integer", "minimum": 1, "maximum": 5},
+        "maximum_output_tokens": {"const": 4096}
+      }
+    },
+    "lane": {
+      "type": "object", "additionalProperties": false, "required": ["passed_trials", "total_trials", "trials"],
+      "properties": {
+        "passed_trials": {"type": "integer", "minimum": 0},
+        "total_trials": {"type": "integer", "minimum": 1, "maximum": 10},
+        "trials": {"type": "array", "minItems": 1, "maxItems": 10, "items": {"$ref": "#/$defs/trial"}}
+      }
+    },
+    "trial": {
+      "type": "object", "additionalProperties": false,
+      "required": ["returncode", "settled", "timed_out", "event_limit_ok", "elapsed_seconds", "changed_paths", "scope_result", "tool_errors", "usage", "trial", "test_result"],
+      "properties": {
+        "returncode": {"type": "integer"},
+        "settled": {"type": "boolean"},
+        "timed_out": {"type": "boolean"},
+        "event_limit_ok": {"type": "boolean"},
+        "elapsed_seconds": {"type": "number", "minimum": 0},
+        "changed_paths": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "scope_result": {
+          "type": "object", "additionalProperties": false, "required": ["ok", "allowed_paths"],
+          "properties": {
+            "ok": {"type": "boolean"},
+            "allowed_paths": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+          }
+        },
+        "tool_errors": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["tool", "category", "count"],
+            "properties": {
+              "tool": {"enum": ["read", "edit", "unavailable"]},
+              "category": {"const": "tool-execution-error"},
+              "count": {"type": "integer", "minimum": 1}
+            }
+          }
+        },
+        "usage": {
+          "type": "object", "additionalProperties": false,
+          "required": ["measurement_origin", "input_tokens", "output_tokens", "cache_read_tokens", "cache_write_tokens"],
+          "properties": {
+            "measurement_origin": {"enum": ["provider-reported", "unavailable"]},
+            "input_tokens": {"type": ["integer", "null"], "minimum": 0},
+            "output_tokens": {"type": ["integer", "null"], "minimum": 0},
+            "cache_read_tokens": {"type": ["integer", "null"], "minimum": 0},
+            "cache_write_tokens": {"type": ["integer", "null"], "minimum": 0}
+          },
+          "allOf": [
+            {
+              "if": {"properties": {"measurement_origin": {"const": "unavailable"}}},
+              "then": {"properties": {"input_tokens": {"const": null}, "output_tokens": {"const": null}, "cache_read_tokens": {"const": null}, "cache_write_tokens": {"const": null}}}
+            },
+            {
+              "if": {"properties": {"measurement_origin": {"const": "provider-reported"}}},
+              "then": {"properties": {"input_tokens": {"type": "integer", "minimum": 0}, "output_tokens": {"type": "integer", "minimum": 0}, "cache_read_tokens": {"type": "integer", "minimum": 0}, "cache_write_tokens": {"type": "integer", "minimum": 0}}}
+            }
+          ]
+        },
+        "trial": {"type": "integer", "minimum": 1, "maximum": 10},
+        "test_result": {
+          "type": "object", "additionalProperties": false,
+          "required": ["ok", "passed", "failed_case_ids", "elapsed_seconds", "timed_out"],
+          "properties": {
+            "ok": {"type": "boolean"},
+            "passed": {"type": "integer", "minimum": 0},
+            "failed_case_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"}},
+            "elapsed_seconds": {"type": "number", "minimum": 0},
+            "timed_out": {"type": "boolean"}
+          }
+        }
+      }
+    }
+  }
+}

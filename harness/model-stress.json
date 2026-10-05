@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "authority": "supplemental",
+  "canary": {
+    "family": "qwen-coder",
+    "provider": "runtime-selected",
+    "model": "runtime-selected"
+  },
+  "triggers": {
+    "maximum_reported_loops_between_runs": 10,
+    "release_impacts": ["minor", "major"],
+    "path_prefixes": [
+      ".agents/skills/",
+      ".pi/",
+      "harness/adapters/",
+      "harness/loops/",
+      "harness/roles/",
+      "tools/loop.py"
+    ]
+  },
+  "execution": {
+    "lanes": ["bare", "harness"],
+    "minimum_trials_for_acceptance": 3,
+    "disposable_repository": true,
+    "network_writes": false,
+    "raw_transcript_retention": false,
+    "model_self_approval": false
+  },
+  "required_evidence": [
+    "model",
+    "provider",
+    "pi_version",
+    "serving_runtime",
+    "serving_recipe",
+    "task_id",
+    "prompt_digest",
+    "tool_set",
+    "limits",
+    "trial_count",
+    "test_result",
+    "scope_result",
+    "tool_errors",
+    "elapsed_seconds"
+  ]
+}
