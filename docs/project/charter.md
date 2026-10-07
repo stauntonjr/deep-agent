@@ -1,43 +1,68 @@
 # Project charter
 
-Status: draft
+Status: active
 
 ## Purpose
 
-TBD. Describe the system, its users, the problem it solves, and why it should exist.
+Invited evidence assistant with DGX-local inference and A2A specialist delegation.
+
+Primary users:
+
+- owner
+- invited demonstration viewers
 
 ## Outcomes and success measures
 
-- TBD
+Desired outcomes:
+
+- Evidence-backed procurement delegation
+- Scientific claim checking
+
+Success measures:
+
+- Two viewer ownership tests pass
+- Actual DGX tool use and local browser acceptance recorded
 
 ## Scope
 
 ### In
 
-- TBD
+- Scoped browser assistant
+- A2A client
+- SciFact MCP client
+- Local simulator and deployment package
 
 ### Out
 
-- TBD
+- Procurement repository changes
+- OCI release until final approval
+- Arbitrary shell execution
+- Automatic human approval
 
 ## Constraints
 
-- Security and data classification: TBD
-- Delivery and deployment: TBD
-- Budget and schedule: TBD
-- Licensing and provenance: TBD
-
-## Authority
-
-Humans own product intent, risk acceptance, architecture approval, external side effects, and release authorization. The current autonomy contract is recorded in `harness/project.yaml`.
+- Security: No secrets in the repository
+- Data classification: public synthetic demonstration data
+- Deployment: OCI application with DGX inference; local acceptance first
+- Budget: One-day showcase; one specialist and one retrieval service
+- Licensing: MIT application; upstream dependencies retain their licenses
 
 ## Engineering and release contract
 
-- Harness version: 0.5.0.
-- Product versioning, current version, public compatibility contract, and canonical source: TBD during intake.
-- Primary local/CI check: `make smoke` for the template; derived-project commands are profile-selected.
-- Dependency lock: required when dependencies exist.
-- Coverage: ratchet from an observed baseline or record an explicit reviewed exception.
-- GitHub security expectations: dependency updates and review, CodeQL, secret scanning, push protection, least privilege, and full-SHA Action references.
+- Primary check: make smoke
+- Dependency lock: uv.lock
+- Coverage policy: Focused ownership, protocol, evidence and cancellation checks; no coverage percentage claim for first slice
+- Product versioning: semver at 0.1.0
+- Version source: pyproject.toml:project.version
+- Public contract: Authenticated HTTP routes, Environment configuration, Task record schema
+- Harness version: 0.5.0
 
-Generated from: `harness/project.yaml` and the accepted intake record.
+## Authority
+
+- Autonomy level: supervised
+- Network writes: explicit-human-approval
+- Destructive actions: explicit-human-approval
+- Release: human-only
+- Policy changes: human-review
+
+Generated from `harness/project.yaml` and `harness/intake.json`.

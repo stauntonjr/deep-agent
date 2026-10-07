@@ -1,0 +1,240 @@
+{
+  "schema_version": "1.0",
+  "mode": "refresh",
+  "captured_at": "2026-10-05T03:01:00Z",
+  "answers": {
+    "project.name": {
+      "value": "DeepAgent",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "project.summary": {
+      "value": "Invited evidence assistant with DGX-local inference and A2A specialist delegation.",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "project.repository": {
+      "value": "stauntonjr/deep-agent",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "project.profile": {
+      "value": "generic",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "intent.users": {
+      "value": [
+        "owner",
+        "invited demonstration viewers"
+      ],
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "intent.outcomes": {
+      "value": [
+        "Evidence-backed procurement delegation",
+        "Scientific claim checking"
+      ],
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "intent.success_metrics": {
+      "value": [
+        "Two viewer ownership tests pass",
+        "Actual DGX tool use and local browser acceptance recorded"
+      ],
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "intent.in_scope": {
+      "value": [
+        "Scoped browser assistant",
+        "A2A client",
+        "SciFact MCP client",
+        "Local simulator and deployment package"
+      ],
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "intent.out_of_scope": {
+      "value": [
+        "Procurement repository changes",
+        "OCI release until final approval",
+        "Arbitrary shell execution",
+        "Automatic human approval"
+      ],
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "constraints.data_classification": {
+      "value": "public synthetic demonstration data",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "constraints.deployment": {
+      "value": "OCI application with DGX inference; local acceptance first",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "constraints.licenses": {
+      "value": [
+        "MIT application; upstream dependencies retain their licenses"
+      ],
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "constraints.budget": {
+      "value": "One-day showcase; one specialist and one retrieval service",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "engineering.languages": {
+      "value": [
+        "Python",
+        "JavaScript"
+      ],
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "engineering.build_commands": {
+      "value": [
+        "uv build"
+      ],
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "engineering.test_commands": {
+      "value": [
+        "uv run pytest tests/app -q"
+      ],
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "engineering.command_contract.primary_check": {
+      "value": "make smoke",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "engineering.command_contract.bootstrap": {
+      "value": "uv sync --frozen",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "engineering.command_contract.format_check": {
+      "value": "uv run ruff format --check src tests/app",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "engineering.command_contract.lint": {
+      "value": "uv run ruff check src tests/app",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "engineering.command_contract.typecheck": {
+      "value": "uv run pyright",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "engineering.command_contract.unit": {
+      "value": "uv run pytest tests/app -q",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "engineering.command_contract.integration": {
+      "value": "uv run pytest tests/app/test_specialist.py tests/app/test_assistant.py -q",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "engineering.command_contract.package_smoke": {
+      "value": "uv build",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "engineering.quality.dependency_lock": {
+      "value": "uv.lock",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "engineering.quality.required_checks": {
+      "value": [
+        "format_check",
+        "lint",
+        "typecheck",
+        "unit",
+        "package_smoke"
+      ],
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "engineering.quality.coverage_policy": {
+      "value": "Focused ownership, protocol, evidence and cancellation checks; no coverage percentage claim for first slice",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "engineering.versioning.strategy": {
+      "value": "semver",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "engineering.versioning.current": {
+      "value": "0.1.0",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "engineering.versioning.public_contract": {
+      "value": [
+        "Authenticated HTTP routes",
+        "Environment configuration",
+        "Task record schema"
+      ],
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "engineering.versioning.source": {
+      "value": "pyproject.toml:project.version",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    },
+    "autonomy.level": {
+      "value": "supervised",
+      "status": "confirmed",
+      "source": "/tmp/deepagent-intake-answers.json",
+      "recorded_at": "2026-10-05T03:01:00Z"
+    }
+  },
+  "contradictions": [],
+  "missing_essential_fields": [],
+  "context_readiness": "sufficient"
+}

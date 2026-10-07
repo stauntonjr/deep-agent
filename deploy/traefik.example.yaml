@@ -1,0 +1,15 @@
+# Review against actual OCI network topology before enabling.
+http:
+  routers:
+    deepagent:
+      rule: "Host(`deepagent.ediacarian.dedyn.io`)"
+      entryPoints: [websecure]
+      service: deepagent
+      tls:
+        certResolver: letsencrypt
+  services:
+    deepagent:
+      loadBalancer:
+        servers:
+          # Replace with the private app address reachable from Traefik.
+          - url: "http://deep-agent:8100"

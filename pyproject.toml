@@ -1,17 +1,36 @@
 [project]
-name = "agentic-project-template"
-version = "0.4.1"
-description = "A reusable engineering harness for agent-developed projects"
+name = "deep-agent"
+version = "0.1.0"
+description = "DGX-local evidence assistant with scoped A2A delegation"
 requires-python = ">=3.11"
 license = "MIT"
+dependencies = ["deepagents", "langchain-openai", "langchain-mcp-adapters", "a2a-sdk[http-server]", "fastapi", "uvicorn", "httpx", "bcrypt"]
+
+[dependency-groups]
+dev = ["pytest", "pytest-asyncio", "ruff", "pyright", "playwright", "build"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/deep_agent"]
 
 [tool.ruff]
 line-length = 100
 target-version = "py311"
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests/app"]
+asyncio_mode = "auto"
 
-[tool.coverage.run]
-branch = true
-relative_files = true
+[tool.pyright]
+include = ["src/deep_agent"]
+typeCheckingMode = "basic"
+venvPath = "."
+venv = ".venv"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "B"]
+[tool.ruff.lint.extend-per-file-ignores]
+"src/deep_agent/app.py" = ["B008"]

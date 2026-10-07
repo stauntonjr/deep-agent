@@ -399,3 +399,91 @@ failure exposes an escaped defect with a deterministic oracle, create a candidat
 - Verification boundary: error classification and official recovery commands were checked; live
   setting repair, OAuth refresh, and Project placement have not been completed by this entry.
 - Durable prevention: the planning entry point links the prerequisite and recovery runbook.
+
+## DeepAgent local execution corrections — 2026-10-04
+
+- Failed path: sandboxed FastAPI TestClient stalled. Mutation: none from test.
+  Corrected path: bounded host-permission tests; access suite passed4/4.
+  Guard: use approved host runtime for local async/socket acceptance; do not infer outage.
+- Failed path: legacy A2AClient import and removed Starlette middleware decorator.
+  Signatures: ImportError / AttributeError. Mutation: local test simulator only.
+  Corrected path: inspect installed SDK1.2.1 ClientFactory and FastAPI server APIs;
+  SDK transport suite passed7/7. Guard: lock and inspect actual package API first.
+- Failed path: DeepAgents default tools remained available despite restrictive prompt.
+  Mutation: no external effects. Corrected path: enforced offered/invoked tool allowlist;
+  actual graph regression passed. Guard: verify capability boundary in model requests.
+- Failed path: Playwright browser revision missing, then string polling blocked by CSP.
+  Mutation: test artifacts only. Corrected path: matching /tmp browser installation and
+  locator assertions. Guard: preserve CSP; browser completion recorded separately.
+- Browser reload assertion matched both the artifact and its final summary and failed
+  strict locator selection. Mutation: test harness only. Corrected path: select the
+  artifact region's first matching element; retain failure, do not reinterpret it as
+  an application defect or completed browser check.
+
+## Selected investigation context and review-batch boundaries
+
+Failed approach: tool closures carried project/cutoff while model prompt omitted them.
+Signature: live browser produced a missing-context reply without delegation. Mutation:
+local candidate only. Correction: pass authoritative selected context in system prompt.
+Deterministic regression failed before repair; live browser later delegated successfully.
+
+Failed approach: MCP defaults followed same-origin redirects and enforced limits after
+parsing; refresh saved only task rows; UI allowed history switching during streaming.
+Correction: maintained HTTP factory with redirect rejection/bounded streams, persisted
+owned refresh events, and one browser operation guard. Focused JSON/SSE/redirect,
+working-to-completed export and delayed-stream browser checks passed after repair.
+
+Failed loop command used guessed finding IDs; tool rejected dispositions before any
+code mutation. Corrected path: inspect recorded review IDs and use full identifiers
+review-001-finding-001 through003. Gate accepted all dispositions and independent
+scope review before starting repair attempt2. Preserve actual tool-generated IDs.
+
+## October 6 model timeout and reviewed resume
+
+Failed approach: model requests used a hard-coded30second timeout while the enclosing
+run allowed a validated deadline up to300seconds. Actual source-backed browser runs
+saved completed procurement artifacts, then timed out generating the final brief.
+An isolated same-prompt HTTP request using a saved task status read confirmed
+OpenAITimeoutError without submitting another investigation. Correction: reuse
+Settings.timeout_seconds in the maintained model constructor; retries remain0 and
+the enclosing run deadline is unchanged. A custom90second constructor regression
+failed before repair and passed afterward. Retain prior browser failures as failures.
+
+Failed recovery approach: the structured resume handoff listed absolute temporary
+artifact paths. Signature: invalid declared preserved path. The resume/revise gates
+rejected the sequence; the runtime fix was not applied. A regression test was written
+under the owner's approved scope before the loop boundary was successfully resumed.
+Corrected path: retain sanitized diagnostics under the ignored loop directory and
+list repository-relative preserved paths. Resume and scope revision then succeeded.
+Guard: validate the handoff shape and use checked subprocess transitions before
+subsequent mutations, rather than continue after a failed shell stage.
+
+## October 6 unexecuted model delegation
+
+Failed approach: the system prompt instructed tool use, but a fresh model response
+claimed that investigation was delegated while the application recorded zero tool
+calls and zero tasks. Mutation: temporary acceptance data only; no procurement task
+was submitted. Verification: SQLite event/task counts and the browser's unmet artifact
+condition; sanitized counts retained in the loop. Proposed correction is maintained
+first-call tool choice plus rejecting final answers without verified tool results.
+The proposal is not applied and is not claimed as a durable guard yet.
+
+
+## October 6 — evidence enforcement and host MCP startup
+
+A model final message claimed delegation without a tool event or task. Prompt-only
+instructions failed; the approved repair now requires an initial approved tool and
+rejects final messages without a successfully returned service result. Deterministic
+no-tool and failed-service regressions pass. This establishes result presence, not
+entailment of every generated claim.
+
+Temporary host SciFact MCP was launched with container DNS defaults and failed with
+ConnectError / temporary failure in name resolution. No source was mutated. Corrected
+GENERATOR_BASE_URL and LATE_INTERACTION_BASE_URL point at existing host services.
+Browser verification was restarted; original failure remains recorded.
+
+Loop command correction: revise preserved a blocked terminal state; resume then refused
+a non-retry-exhausted run. The owner already authorized continued repairs; applied
+guard and regression were retained, then a continuation loop explicitly recorded its
+post-patch baseline limitation. Future terminal recovery must inspect recovery-status
+and command prerequisites before writing; no baseline is retroactively invented.

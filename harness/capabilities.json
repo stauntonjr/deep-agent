@@ -277,7 +277,7 @@
         "ports-and-adapters",
         "visible-wiring"
       ],
-      "status": "inactive",
+      "status": "active",
       "purpose": "Keep domain and application semantics independent of frameworks while one visible composition root wires ports to concrete adapters.",
       "source_projects": [
         {
@@ -307,6 +307,23 @@
         "A named composition-root module.",
         "Constructor injection without a service locator or import-time global wiring."
       ],
+      "active_contract": {
+        "implementation_paths": [
+          "src/deep_agent/assistant.py",
+          "src/deep_agent/config.py",
+          "src/deep_agent/__main__.py"
+        ],
+        "runtime_dependencies": [
+          "deepagents",
+          "fastapi",
+          "a2a-sdk",
+          "langchain-mcp-adapters"
+        ],
+        "ci_checks": [
+          "uv run pytest tests/app -q"
+        ],
+        "activation_authority": "owner: begin plan execution"
+      },
       "inactive_contract": {
         "runtime_dependencies": [],
         "ci_checks": [],
@@ -356,7 +373,7 @@
         "api-adapter",
         "http-adapter"
       ],
-      "status": "inactive",
+      "status": "active",
       "purpose": "Expose existing application use cases through a thin HTTP adapter without moving semantics into the web framework.",
       "source_projects": [
         {
@@ -382,6 +399,21 @@
         "Explicit human approval.",
         "An HTTP contract and end-to-end acceptance check."
       ],
+      "active_contract": {
+        "implementation_paths": [
+          "src/deep_agent/app.py"
+        ],
+        "runtime_dependencies": [
+          "deepagents",
+          "fastapi",
+          "a2a-sdk",
+          "langchain-mcp-adapters"
+        ],
+        "ci_checks": [
+          "uv run pytest tests/app -q"
+        ],
+        "activation_authority": "owner: begin plan execution"
+      },
       "inactive_contract": {
         "runtime_dependencies": [],
         "ci_checks": [],
@@ -431,7 +463,7 @@
         "browser-ui",
         "web-ui-adapter"
       ],
-      "status": "inactive",
+      "status": "active",
       "purpose": "Add a small web interface over proven application use cases without creating an independent domain implementation.",
       "source_projects": [
         {
@@ -457,6 +489,21 @@
         "Explicit human approval.",
         "A bounded workflow and browser-level acceptance check."
       ],
+      "active_contract": {
+        "implementation_paths": [
+          "src/deep_agent/web"
+        ],
+        "runtime_dependencies": [
+          "deepagents",
+          "fastapi",
+          "a2a-sdk",
+          "langchain-mcp-adapters"
+        ],
+        "ci_checks": [
+          "uv run pytest tests/app -q"
+        ],
+        "activation_authority": "owner: begin plan execution"
+      },
       "inactive_contract": {
         "runtime_dependencies": [],
         "ci_checks": [],

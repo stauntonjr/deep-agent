@@ -1,54 +1,94 @@
 {
   "schema_version": "1.0",
   "harness_version": "0.5.0",
-  "template_mode": true,
+  "template_mode": false,
   "project": {
-    "name": "TBD",
-    "summary": "TBD",
+    "name": "DeepAgent",
+    "summary": "Invited evidence assistant with DGX-local inference and A2A specialist delegation.",
     "lifecycle": "new",
     "profile": "generic",
-    "status": "draft",
-    "repository": "OWNER/REPOSITORY"
+    "status": "active",
+    "repository": "stauntonjr/deep-agent"
   },
   "intent": {
-    "users": [],
-    "outcomes": [],
-    "success_metrics": [],
-    "in_scope": [],
-    "out_of_scope": []
+    "users": [
+      "owner",
+      "invited demonstration viewers"
+    ],
+    "outcomes": [
+      "Evidence-backed procurement delegation",
+      "Scientific claim checking"
+    ],
+    "success_metrics": [
+      "Two viewer ownership tests pass",
+      "Actual DGX tool use and local browser acceptance recorded"
+    ],
+    "in_scope": [
+      "Scoped browser assistant",
+      "A2A client",
+      "SciFact MCP client",
+      "Local simulator and deployment package"
+    ],
+    "out_of_scope": [
+      "Procurement repository changes",
+      "OCI release until final approval",
+      "Arbitrary shell execution",
+      "Automatic human approval"
+    ]
   },
   "constraints": {
-    "security": ["No secrets in the repository"],
-    "data_classification": "TBD",
-    "deployment": "TBD",
-    "budget": "TBD",
-    "licenses": ["TBD"]
+    "security": [
+      "No secrets in the repository"
+    ],
+    "data_classification": "public synthetic demonstration data",
+    "deployment": "OCI application with DGX inference; local acceptance first",
+    "budget": "One-day showcase; one specialist and one retrieval service",
+    "licenses": [
+      "MIT application; upstream dependencies retain their licenses"
+    ]
   },
   "engineering": {
-    "languages": [],
-    "build_commands": [],
-    "test_commands": ["python3 -m unittest discover -s tests -v"],
+    "languages": [
+      "Python",
+      "JavaScript"
+    ],
+    "build_commands": [
+      "uv build"
+    ],
+    "test_commands": [
+      "uv run pytest tests/app -q"
+    ],
     "command_contract": {
       "primary_check": "make smoke",
-      "bootstrap": "TBD",
-      "format_check": "TBD",
-      "lint": "TBD",
-      "typecheck": "TBD",
-      "unit": "python3 -m unittest discover -s tests -v",
-      "integration": "TBD",
-      "package_smoke": "TBD"
+      "bootstrap": "uv sync --frozen",
+      "format_check": "uv run ruff format --check src tests/app",
+      "lint": "uv run ruff check src tests/app",
+      "typecheck": "uv run pyright",
+      "unit": "uv run pytest tests/app -q",
+      "integration": "uv run pytest tests/app/test_specialist.py tests/app/test_assistant.py -q",
+      "package_smoke": "uv build"
     },
     "quality": {
-      "dependency_lock": "required-if-dependencies",
-      "coverage_policy": "ratchet-or-explicit-exception",
-      "required_checks": ["format_check", "lint", "unit"],
+      "dependency_lock": "uv.lock",
+      "coverage_policy": "Focused ownership, protocol, evidence and cancellation checks; no coverage percentage claim for first slice",
+      "required_checks": [
+        "format_check",
+        "lint",
+        "typecheck",
+        "unit",
+        "package_smoke"
+      ],
       "property_testing": "profile-selected"
     },
     "versioning": {
-      "strategy": "TBD",
-      "current": "TBD",
-      "public_contract": [],
-      "source": "TBD",
+      "strategy": "semver",
+      "current": "0.1.0",
+      "public_contract": [
+        "Authenticated HTTP routes",
+        "Environment configuration",
+        "Task record schema"
+      ],
+      "source": "pyproject.toml:project.version",
       "tag_prefix": "v",
       "pre_1_0_policy": "breaking-changes-bump-minor",
       "release_notes": "CHANGELOG.md"
@@ -64,12 +104,36 @@
     "policy_changes": "human-review"
   },
   "sources_of_truth": [
-    {"rank": 1, "source": "accepted ADRs", "scope": "durable architecture decisions"},
-    {"rank": 2, "source": "code and schemas", "scope": "implemented behavior"},
-    {"rank": 3, "source": "tests and check evidence", "scope": "verified behavior"},
-    {"rank": 4, "source": "GitHub Issues", "scope": "accepted work and acceptance criteria"},
-    {"rank": 5, "source": "GitHub Project", "scope": "operational planning view"},
-    {"rank": 6, "source": "handoff and reports", "scope": "orientation and derived status"}
+    {
+      "rank": 1,
+      "source": "accepted ADRs",
+      "scope": "durable architecture decisions"
+    },
+    {
+      "rank": 2,
+      "source": "code and schemas",
+      "scope": "implemented behavior"
+    },
+    {
+      "rank": 3,
+      "source": "tests and check evidence",
+      "scope": "verified behavior"
+    },
+    {
+      "rank": 4,
+      "source": "GitHub Issues",
+      "scope": "accepted work and acceptance criteria"
+    },
+    {
+      "rank": 5,
+      "source": "GitHub Project",
+      "scope": "operational planning view"
+    },
+    {
+      "rank": 6,
+      "source": "handoff and reports",
+      "scope": "orientation and derived status"
+    }
   ],
   "github": {
     "issues_are_canonical_work_items": true,
@@ -85,10 +149,6 @@
       "action_pinning": "full-commit-sha"
     }
   },
-  "open_questions": [
-    "Who are the primary users?",
-    "What measurable outcome defines the first useful release?",
-    "What data, security, and deployment constraints apply?"
-  ],
+  "open_questions": [],
   "decisions": []
 }

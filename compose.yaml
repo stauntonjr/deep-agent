@@ -1,0 +1,26 @@
+services:
+  assistant:
+    build: .
+    image: deep-agent:0.1.0
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 128
+    mem_limit: 1g
+    cpus: 1
+    ports: ["127.0.0.1:8100:8100"]
+    tmpfs: ["/tmp:size=64m,mode=1777"]
+    volumes:
+      - deepagent-data:/data
+      - ${DEEPAGENT_USERS_FILE:?provide a private viewer credential file}:/run/secrets/deepagent-users:ro
+    environment:
+      DEEPAGENT_PRODUCTION: "1"
+      DEEPAGENT_ORIGIN: ${DEEPAGENT_ORIGIN:?provide the HTTPS origin}
+      DEEPAGENT_USERS_FILE: /run/secrets/deepagent-users
+      DEEPAGENT_MODEL_URL: ${DEEPAGENT_MODEL_URL:?provide the private DGX model URL}
+      DEEPAGENT_MODEL: ${DEEPAGENT_MODEL:-nvidia/Qwen3.6-35B-A3B-NVFP4}
+      DEEPAGENT_SPECIALIST_URL: ${DEEPAGENT_SPECIALIST_URL:?provide the accepted specialist endpoint}
+      DEEPAGENT_SCIFACT_URL: ${DEEPAGENT_SCIFACT_URL:?provide the private SciFact MCP endpoint}
+volumes:
+  deepagent-data:
