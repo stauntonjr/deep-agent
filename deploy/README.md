@@ -73,3 +73,37 @@ image; restore the bridge release PYTHONPATH if applicable. On a first failed de
 move only the DeepAgent route out of the watched VPS directory, disable only Tailscale
 port18100, and stop only the DeepAgent app/units. Do not reset all Tailscale Serve routes,
 restart Traefik or change other applications. DNS may remain reserved for this hostname.
+
+
+## Owner-approved LangSmith export
+
+The owner explicitly authorized export on October8. The base profile still defaults
+to local-only tracing. Apply the optional overlay to enable the configured project
+`deepagent-showcase` on the existing image; it mounts only the private key file.
+Credentials remain owned by the configured app UID and mode0600, outside Git.
+
+```sh
+# Keep the source revision and private-state variables from the existing deployment.
+docker compose -f deploy/compose.dgx.yaml -f deploy/compose.tracing.yaml \
+  up -d --no-deps assistant
+```
+
+Bridge `bridge.env` must also set DEEPAGENT_LANGSMITH_TRACING=1,
+DEEPAGENT_LANGSMITH_PROJECT=deepagent-showcase and DEEPAGENT_LANGSMITH_KEY_FILE
+pointing to the private persistent `langsmith-key`, then restart only deepagent-bridge.
+For the installed LangSmith SDK0.14.4, also supply `LANGSMITH_API_KEY` from that
+same key and `LANGSMITH_PROJECT=deepagent-showcase` in the ignored mode0600
+`bridge.env`. Header-parent reconstruction uses the SDK's default client/project;
+the explicit key-file client alone does not configure that default. Never put the
+key in Compose arguments, source files, or logs. Do not set a global tracing flag:
+the DeepAgent opt-in continues to control export.
+The assistant and bridge export future run prompts/results and service span metadata.
+Trace IDs correlate the UI record to the cloud root. LangSmith's workspace permissions
+control cloud access; public trace sharing and invitation distribution require their
+own instructions. Existing local downloads and viewer isolation remain unchanged.
+
+To disable export, set bridge tracing0 and restart only that bridge; recreate only the
+assistant using the base compose.dgx.yaml without the tracing overlay. Keep credentials
+and SQLite state for rollback. The overlay should be included in subsequent app updates
+while export is intended to remain enabled. Recorded cloud-delivery verification lives
+in the local langsmith-export run; configured opt-in alone is not proof of delivery.

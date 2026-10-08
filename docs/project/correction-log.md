@@ -545,3 +545,26 @@ technical/scope review selected only a named per-service Traefik transport to es
 a fresh pool, without restarting the shared edge. Public health must pass before browser
 acceptance/model execution is attempted. The first premature browser check timed out at
 its missing starter button and performed no model invocation; it remains failed.
+
+
+## October 8 — distributed LangSmith default client
+
+The first authorized public run exported the assistant's24 spans but omitted the
+procurement bridge. The bridge's explicit tracing client read a private key file;
+installed LangSmith0.14.4 reconstructed the header parent without that client or
+project, then used its cached default. The journal reported
+`LangSmithMissingAPIKeyWarning` and multipart401. Export activation had occurred;
+this failure did not alter procurement results or model configuration.
+
+Independent scope review selected the documented standard `LANGSMITH_API_KEY`
+and `LANGSMITH_PROJECT` settings in the existing ignored0600 bridge environment,
+using the same authorized key/project, followed by only a bridge restart. No new
+global tracing flag, parser, dependency or app behavior was added. Guard: preserve
+these settings in the deployment instructions and verify cloud parentage through
+the actual A2A boundary; an offline span tree or opt-in health flag alone is
+insufficient. The failed initial tree remains in the local langsmith-export run.
+After correction, a fresh public browser run completed in38.45seconds. Cloud CLI
+inspection found38 completed spans under the UI trace ID: two local model calls,
+one A2A SendMessage, its procurement task child, one investigation read and12 source
+reads parented to that task. This is live delivery/parentage proof for the synthetic
+procurement demonstration, not a quality evaluation.

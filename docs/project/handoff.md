@@ -131,3 +131,21 @@ model and sibling applications remain under their existing supervisors. No LangS
 export or invitation distribution is authorized by this hosting request. Exact artifact,
 public browser and rollout status are recorded in the local `vps-deployment` engineering
 run; consult that evidence rather than inferring public readiness from these files.
+
+
+## LangSmith export authorization — October 8
+
+Owner explicitly requested “Enable langsmith export”. The deployed assistant and
+A2A bridge use the existing reviewed instrumentation and private persistent LCA key,
+with explicit opt-in to `deepagent-showcase`. The optional Compose tracing overlay
+preserves a local-only base profile and must be retained in future traced deployments.
+Only assistant/bridge restart; no model or sibling service changes. New app runs export
+prompts/results; local viewer ownership and cloud workspace permissions remain separate.
+Public sharing is not enabled. Current cloud delivery and trace tree evidence is recorded
+in `.harness/runs/langsmith-export`; do not infer delivery solely from configuration.
+Fresh public acceptance completed in38.45seconds. Authenticated LangSmith CLI
+inspection verified38 completed spans in one tree, including two local model calls,
+A2A SendMessage, its procurement task child, one investigation read and12 source reads.
+The bridge additionally needs the private standard SDK key/project environment settings
+documented in deploy/README; the first incomplete tree and SDK default-client401
+remain recorded. Existing app0.1.0/image21e1c31 and backing model are unchanged.

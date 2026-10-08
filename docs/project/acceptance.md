@@ -116,3 +116,18 @@ cover actual procurement A2A, scoped request/reply,8required/6ordered/12sources,
 SciFact MCP, reload/downloads, cross-viewer404 and narrow layout. Separate checks must
 prove TLS, authentication, persistent service restart and preservation of sibling services.
 Configuration alone is not public acceptance. LangSmith export remains a separate consent.
+
+
+## Authorized export acceptance
+
+The October8 owner request enables future assistant/bridge export to `deepagent-showcase`.
+Verify a fresh public procurement journey, match its UI correlation ID to the cloud root,
+and inspect graph/model/tool/A2A task plus investigation/source spans through the LangSmith
+CLI. Exact completed cloud checks belong to `.harness/runs/langsmith-export`. Old runs
+created while export was disabled are not backfilled. Credentials remain private; only
+visible identifiers/timings/status are needed in the verification report. No public
+trace-sharing or source correctness guarantee follows from successful delivery.
+The executed public run passed in38.45seconds; its cloud tree had38 completed spans,
+two local model calls, one procurement task under A2A SendMessage, one investigation
+read and12 source reads. Private `cloud-verification.json` binds those checks to the
+actual UI trace ID. No old runs were re-uploaded.

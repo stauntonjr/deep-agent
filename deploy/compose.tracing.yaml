@@ -1,0 +1,9 @@
+# Explicit owner opt-in; apply alongside compose.dgx.yaml after payload approval.
+services:
+  assistant:
+    volumes:
+      - ${DEEPAGENT_STATE_DIR:?private state directory}/langsmith-key:/run/secrets/langsmith-key:ro
+    environment:
+      DEEPAGENT_LANGSMITH_TRACING: "1"
+      DEEPAGENT_LANGSMITH_PROJECT: deepagent-showcase
+      DEEPAGENT_LANGSMITH_KEY_FILE: /run/secrets/langsmith-key
