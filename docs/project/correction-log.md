@@ -535,3 +535,13 @@ Direct host reading of root-owned ACME storage was denied. No secret was printed
 file modified. Parsed the container's existing storage through a captured subprocess,
 printing only whether the requested hostname's certificate existed. Guard: keep private
 ACME material in its existing owner boundary and inspect only certificate metadata.
+
+
+After TCP repair, fresh direct/private/VPS and Traefik-namespace connections reached
+app authentication, but public Traefik requests still returned the former Serve404.
+Access logs identified the same backend; continuing scanner traffic made waiting for
+idle expiry ineffective. Retained old HTTP pooling remained an inference. Independent
+technical/scope review selected only a named per-service Traefik transport to establish
+a fresh pool, without restarting the shared edge. Public health must pass before browser
+acceptance/model execution is attempted. The first premature browser check timed out at
+its missing starter button and performed no model invocation; it remains failed.

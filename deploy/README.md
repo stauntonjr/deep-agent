@@ -4,7 +4,9 @@ Owner-authorized hostname: `deepagent.ediacarian.dedyn.io`.
 The VPS terminates TLS using its existing Traefik `desecresolver` and watched file
 provider. `traefik.deepagent.yaml` forwards to DGX tailnet port18100; Tailscale Serve TCP
 forwards that private listener to127.0.0.1:8100. Host headers are preserved for the
-application's fixed HTTPS origin. No model, A2A, database or MCP port is public.
+application's fixed HTTPS origin. A dedicated Traefik serversTransport gives this route
+its own connection pool, with10s dial/idle and310s response-header limits; it does
+not impose a310s response-body/stream timeout. No model, A2A, database or MCP port is public.
 
 The ARM app runs on DGX from the existing Dockerfile and frozen lock. Build an image
 from an exact committed source archive, tag it with that complete revision, and record

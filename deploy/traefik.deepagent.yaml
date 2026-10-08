@@ -17,10 +17,17 @@ http:
         frameDeny: true
         referrerPolicy: no-referrer
         stsSeconds: 31536000
+  serversTransports:
+    deepagent-private:
+      forwardingTimeouts:
+        dialTimeout: 10s
+        responseHeaderTimeout: 310s
+        idleConnTimeout: 10s
   services:
     deepagent-dgx:
       loadBalancer:
         # Preserve the public hostname for the app's existing Host/Origin check.
         passHostHeader: true
+        serversTransport: deepagent-private
         servers:
           - url: "http://spark-3a8f.tail64bbe0.ts.net:18100"
