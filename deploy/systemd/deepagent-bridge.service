@@ -1,0 +1,14 @@
+[Unit]
+Description=DeepAgent read-only procurement A2A bridge
+After=network-online.target deepagent-procurement.service
+Wants=deepagent-procurement.service
+[Service]
+WorkingDirectory=/home/jrs/deep-agent
+EnvironmentFile=/home/jrs/deep-agent/.harness/runs/vps-deployment/private/bridge.env
+ExecStart=/home/jrs/deep-agent/.venv/bin/python -m deep_agent.bridge
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+UMask=0077
+[Install]
+WantedBy=default.target

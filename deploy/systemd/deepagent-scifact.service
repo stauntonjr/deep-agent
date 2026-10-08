@@ -1,0 +1,13 @@
+[Unit]
+Description=DeepAgent private SciFact MCP reader
+After=network-online.target
+[Service]
+WorkingDirectory=/home/jrs/scifact-rag
+EnvironmentFile=/home/jrs/deep-agent/.harness/runs/vps-deployment/private/scifact.env
+ExecStart=/home/jrs/scifact-rag/.venv/bin/python -c 'from scifact_rag.mcp_server import build_mcp_server; build_mcp_server().run(transport="streamable-http",host="127.0.0.1",port=8091,streamable_http_path="/mcp",stateless_http=True,json_response=True)'
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+UMask=0077
+[Install]
+WantedBy=default.target

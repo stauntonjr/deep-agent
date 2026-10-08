@@ -20,6 +20,9 @@ class Settings(BaseModel):
     scifact_url: str = "http://127.0.0.1:8091/mcp"
     service_token_file: Path | None = None
     timeout_seconds: float = 300
+    langsmith_tracing: bool = False
+    langsmith_project: str = "deepagent-showcase"
+    langsmith_key_file: Path | None = None
 
     @model_validator(mode="after")
     def validate_settings(self):
@@ -58,6 +61,8 @@ class Settings(BaseModel):
             "specialist_rpc_url": "DEEPAGENT_SPECIALIST_RPC_URL",
             "scifact_url": "DEEPAGENT_SCIFACT_URL",
             "service_token_file": "DEEPAGENT_SERVICE_TOKEN_FILE",
+            "langsmith_project": "DEEPAGENT_LANGSMITH_PROJECT",
+            "langsmith_key_file": "DEEPAGENT_LANGSMITH_KEY_FILE",
         }
         values: dict[str, object] = {
             key: os.environ[name] for key, name in mapping.items() if name in os.environ
@@ -65,5 +70,6 @@ class Settings(BaseModel):
         values.update(
             production=os.getenv("DEEPAGENT_PRODUCTION") == "1",
             simulated=os.getenv("DEEPAGENT_SIMULATED") == "1",
+            langsmith_tracing=os.getenv("DEEPAGENT_LANGSMITH_TRACING") == "1",
         )
         return cls.model_validate(values)

@@ -1,0 +1,26 @@
+http:
+  routers:
+    deepagent-app:
+      rule: "Host(`deepagent.ediacarian.dedyn.io`)"
+      entryPoints: [websecure]
+      priority: 100
+      service: deepagent-dgx
+      middlewares: [deepagent-security]
+      tls:
+        certResolver: desecresolver
+        domains:
+          - main: deepagent.ediacarian.dedyn.io
+  middlewares:
+    deepagent-security:
+      headers:
+        contentTypeNosniff: true
+        frameDeny: true
+        referrerPolicy: no-referrer
+        stsSeconds: 31536000
+  services:
+    deepagent-dgx:
+      loadBalancer:
+        # Preserve the public hostname for the app's existing Host/Origin check.
+        passHostHeader: true
+        servers:
+          - url: "http://spark-3a8f.tail64bbe0.ts.net:18100"

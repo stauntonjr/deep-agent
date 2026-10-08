@@ -1,0 +1,54 @@
+name: deepagent-production
+services:
+  assistant:
+    image: deep-agent:${DEEPAGENT_REVISION:?set the immutable source revision}
+    # Match ownership of private host credential and data files, while remaining non-root.
+    user: "${DEEPAGENT_UID:-1000}:${DEEPAGENT_GID:-1000}"
+    network_mode: host
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 128
+    mem_limit: 1g
+    cpus: 1
+    tmpfs: ["/tmp:size=64m,mode=1777"]
+    volumes:
+      - ${DEEPAGENT_STATE_DIR:?private state directory}/data:/data
+      - ${DEEPAGENT_STATE_DIR}/users:/run/secrets/deepagent-users:ro
+      - ${DEEPAGENT_STATE_DIR}/service-token:/run/secrets/service-token:ro
+    environment:
+      DEEPAGENT_BIND: "127.0.0.1"
+      DEEPAGENT_DATABASE: /data/deepagent.sqlite
+      DEEPAGENT_USERS_FILE: /run/secrets/deepagent-users
+      DEEPAGENT_SERVICE_TOKEN_FILE: /run/secrets/service-token
+      DEEPAGENT_PRODUCTION: "1"
+      DEEPAGENT_ORIGIN: https://deepagent.ediacarian.dedyn.io
+      DEEPAGENT_MODEL_URL: http://172.17.0.1:8000/v1
+      DEEPAGENT_MODEL: nvidia/Qwen3.6-35B-A3B-NVFP4
+      DEEPAGENT_SPECIALIST_URL: http://127.0.0.1:8101
+      DEEPAGENT_SCIFACT_URL: http://127.0.0.1:8091/mcp
+      DEEPAGENT_LANGSMITH_TRACING: "0"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      #401 proves the authenticated app is serving; full tool readiness is checked separately.
+      test:
+        - CMD
+        - /app/.venv/bin/python
+        - -c
+        - |
+          import urllib.request, urllib.error, sys
+          req = urllib.request.Request('http://127.0.0.1:8100/healthz', headers={'Host': 'deepagent.ediacarian.dedyn.io'})
+          try:
+              urllib.request.urlopen(req, timeout=2)
+          except urllib.error.HTTPError as error:
+              sys.exit(0 if error.code == 401 else 1)
+          sys.exit(1)
+      interval: 20s
+      timeout: 3s
+      retries: 3
+      start_period: 10s

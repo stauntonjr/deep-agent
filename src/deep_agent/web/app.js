@@ -13,18 +13,50 @@ async function api(path, options = {}) {
   if (!response.ok) throw new Error(response.status === 429 ? 'The run queue is full. Please wait.' : response.status === 401 ? 'Sign in again to continue.' : 'Request failed. Previous evidence remains available.');
   return response;
 }
+function node(tag, text, className) {
+  const el = document.createElement(tag); if (text !== undefined) el.textContent = String(text);
+  if(className) el.className = className; return el;
+}
 function display(event) {
-  const card = document.createElement('article'); card.className = 'event ' + (event.kind === 'error' ? 'error' : event.kind === 'user' ? 'user' : '');
-  const heading = document.createElement('h2'); heading.textContent = event.kind;
-  const text = document.createElement('pre');
-  if (event.kind === 'task') {
-    const task = event.task;
-    text.textContent = `${task.simulated ? 'SIMULATED SPECIALIST · ' : ''}${task.state}\nTask: ${task.id}\n` + (task.artifacts || []).map(a => a.text).join('\n\n');
-    const refresh = document.createElement('button'); refresh.textContent = 'Refresh task status';
-    refresh.onclick = async () => {if(busy)return;setBusy(true);try {display({kind:'task',task:await (await api('/api/tasks/' + encodeURIComponent(task.id))).json()});} catch {byId('status').textContent = 'Task service unavailable; last result retained.';}finally{setBusy(false);}};
+  const card = node('article', undefined, 'event ' + (event.kind === 'error' ? 'error' : event.kind === 'user' ? 'user' : event.kind));
+  const labels = {user:'Your request',model:'DGX model',trace:'Run trace',a2a:'A2A exchange',task:'Procurement evidence',answer:'DeepAgent brief',evidence:'Scientific evidence'};
+  card.append(node('h2', labels[event.kind] || event.kind));
+  if(event.observed_at) card.append(node('span', new Date(event.observed_at).toLocaleTimeString(), 'event-time'));
+  if(event.kind === 'a2a') {
+    card.append(node('h3', event.sender + ' → ' + event.receiver));
+    if(event.phase === 'request') {
+      card.append(node('p', event.question));
+      card.append(node('p', 'SendMessage · ' + event.project + ' · cutoff ' + event.as_of, 'muted'));
+    } else {
+      card.append(node('p', 'Task ' + event.state + ' · ' + (event.elapsed_ms / 1000).toFixed(2) + 's round trip'));
+      if(event.observations && event.observations.source_count !== undefined) card.append(node('p', 'Observed: investigation read + ' + event.observations.source_count + ' source reads.'));
+      card.append(node('p', 'Remote task: ' + event.remote_id, 'muted'));
+    }
+    card.append(node('p', 'Correlation: ' + event.correlation_id, 'muted'));
+  } else if(event.kind === 'task') {
+    const task=event.task; let artifact;
+    try {artifact=JSON.parse((task.artifacts || [])[0].text);} catch {artifact=null;}
+    card.append(node('h3', (task.simulated ? 'Simulated · ' : '') + task.state));
+    if(artifact && artifact.investigation) {
+      card.append(node('p', artifact.project + ' · ' + artifact.item));
+      const facts=node('div',undefined,'facts');
+      for(const [label,value] of [['Required',artifact.investigation.required_quantity],['Ordered',artifact.investigation.ordered_quantity],['Sources',Array.isArray(artifact.sources)?artifact.sources.length:null]]) {
+        const fact=node('div');fact.append(node('span',label),node('strong',value === null || value === undefined ? 'Not assessed' : value));facts.append(fact);
+      }
+      card.append(facts,node('p',artifact.data_boundary,'muted'));
+    }
+    const details=node('details');details.append(node('summary','Inspect raw evidence artifact'),node('pre',(task.artifacts || []).map(a=>a.text).join('\n\n')));card.append(details);
+    const refresh=node('button','Refresh task status');
+    refresh.onclick=async()=>{if(busy)return;setBusy(true);try{display({kind:'task',task:await(await api('/api/tasks/'+encodeURIComponent(task.id))).json()});}catch{byId('status').textContent='Task service unavailable; last result retained.';}finally{setBusy(false);}};
     card.append(refresh);
-  } else text.textContent = event.text || JSON.stringify(event.evidence, null, 2);
-  card.prepend(heading, text); byId('events').append(card);
+  } else if(event.kind === 'trace') {
+    card.append(node('p',event.text),node('p','Trace ID: '+event.trace_id,'muted'));
+    if(event.project) card.append(node('p','LangSmith project: '+event.project,'muted'));
+  } else {
+    card.append(node('pre',event.text || JSON.stringify(event.evidence,null,2)));
+    if(event.elapsed_ms !== undefined) card.append(node('span',(event.elapsed_ms/1000).toFixed(2)+'s','muted'));
+  }
+  byId('events').append(card);
 }
 async function history() {
   const sessions = await (await api('/api/sessions')).json(); const nav = byId('sessions'); nav.replaceChildren();
@@ -60,4 +92,6 @@ byId('composer').onsubmit = async event => {
 byId('stop').onclick=()=>controller?.abort();
 byId('download').onclick=async()=>{if(!sessionId)return; try{const blob=await(await api('/api/sessions/'+sessionId+'/download')).blob();const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download='evidence-brief.json';link.click();setTimeout(()=>URL.revokeObjectURL(link.href),1000);}catch{showError();}};
 byId('reset').onclick=async()=>{if(!sessionId||busy)return;setBusy(true);try{await api('/api/sessions/'+sessionId,{method:'DELETE'});sessionId=null;byId('events').replaceChildren();await history();}catch{showError();}finally{setBusy(false);}};
-(async()=>{try{const health=await(await api('/healthz')).json();byId('mode').textContent=health.simulated?'SIMULATED PROCUREMENT · LIVE LOCAL MODEL':'PROCUREMENT INTEGRATION PENDING';await history();}catch{showError();}})();
+(async()=>{try{const health=await(await api('/healthz')).json();byId('mode').textContent=health.simulated?'SIMULATED PROCUREMENT · LIVE LOCAL MODEL':'READ-ONLY PROCUREMENT · A2A';await history();}catch{showError();}})();
+
+byId('trace-download').onclick = () => {if(sessionId)location.href='/api/sessions/'+encodeURIComponent(sessionId)+'/trace';};

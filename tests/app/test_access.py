@@ -41,6 +41,11 @@ def test_owned_sessions_and_artifacts_are_not_shared(client):
     assert client.get("/api/sessions/" + sid, auth=("bob", "pass")).status_code == 404
     assert client.get("/api/sessions", auth=("bob", "pass")).json() == []
     assert client.get("/api/sessions/" + sid + "/download", auth=("bob", "pass")).status_code == 404
+    assert client.get("/api/sessions/" + sid + "/trace", auth=("bob", "pass")).status_code == 404
+    trace = client.get("/api/sessions/" + sid + "/trace", auth=("alice", "pass"))
+    assert trace.status_code == 200
+    assert trace.json() == {"schema_version": "deepagent-trace/v1", "session_id": sid, "events": []}
+    assert "attachment" in trace.headers["Content-Disposition"]
     assert client.delete("/api/sessions/" + sid, auth=("bob", "pass")).status_code == 404
 
 

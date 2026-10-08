@@ -1,0 +1,13 @@
+[Unit]
+Description=DeepAgent local synthetic procurement corpus reader
+After=network-online.target
+[Service]
+WorkingDirectory=/home/jrs/procurement-intelligence-lab
+Environment=PYTHONPATH=/home/jrs/procurement-intelligence-lab/src
+ExecStart=/home/jrs/procurement-intelligence-lab/.venv/bin/python -m procurement_intelligence_lab.interfaces.web --port 8092
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+UMask=0077
+[Install]
+WantedBy=default.target

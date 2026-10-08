@@ -487,3 +487,31 @@ a non-retry-exhausted run. The owner already authorized continued repairs; appli
 guard and regression were retained, then a continuation loop explicitly recorded its
 post-patch baseline limitation. Future terminal recovery must inspect recovery-status
 and command prerequisites before writing; no baseline is retroactively invented.
+
+
+## October 8 — project runtime and external trace authority
+
+System `python3` could not import dotenv while locating the authorized LCA configuration
+(`ModuleNotFoundError: dotenv`). No credential was printed and no repository mutation
+occurred. Corrected path uses the project `.venv/bin/python`, already containing dotenv;
+key-only metadata inspection and authenticated read-only LangSmith project listing succeeded.
+Guard: use the repository runtime for dependency-backed configuration inspection.
+
+Starting trace export was rejected by automatic approval review: credential discovery
+and a stronger showcase did not establish explicit authority to upload prompts/results.
+No export process started. Continued with DEEPAGENT_LANGSMITH_TRACING disabled and
+requested explicit payload approval. Local browser and mocked distributed SDK checks pass.
+Guard: distinguish credential access from external data-export authority.
+
+Restricted async TestClient run stalled after four tests; interruption left source unchanged.
+The approved host-runtime rerun completed34tests in3.39seconds. Guard: ASGI/threaded
+runtime checks here use the approved host path; a sandbox stall is not a service outage.
+
+
+## October 8 — deployment healthcheck escaping
+
+The staged Compose healthcheck used Python single-quoted source nested inside YAML
+double quotes. Rendered YAML converted newline escapes into literal newlines inside
+that Python string (`SyntaxError: unterminated string literal`). No container was started
+with the invalid command. Replaced it with YAML's literal block and compiled the rendered
+Python successfully. Guard: compile the rendered command, not only validate Compose YAML.

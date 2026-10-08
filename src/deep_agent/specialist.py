@@ -4,14 +4,18 @@ import asyncio
 import json
 from contextlib import asynccontextmanager
 from datetime import datetime
+from time import perf_counter
 from urllib.parse import urlsplit
 from uuid import uuid4
 
 import httpx
 from a2a.client import A2ACardResolver, ClientConfig, ClientFactory
 from a2a.types import a2a_pb2 as p
+from google.protobuf.json_format import MessageToDict
+from langsmith import trace
 
 from .config import Settings
+from .observability import client_for, context_for
 from .store import Store
 
 
@@ -45,6 +49,7 @@ class SpecialistClient:
         self.settings = settings
         self.store = store
         self.transport = transport
+        self.trace_client = client_for(settings)
 
     @asynccontextmanager
     async def client(self):
@@ -128,9 +133,12 @@ class SpecialistClient:
             "context_id": task.context_id,
             "state": state,
             "artifacts": artifacts,
+            "observations": MessageToDict(task.metadata).get("observations", {}),
         }
 
-    async def investigate(self, viewer_id, session_id, question, project, as_of):
+    async def investigate(
+        self, viewer_id, session_id, question, project, as_of, *, on_event=None, correlation_id=None
+    ):
         self.store.owned(viewer_id, session_id)
         cutoff = datetime.fromisoformat(as_of.replace("Z", "+00:00"))
         if cutoff.tzinfo is None:
@@ -140,32 +148,78 @@ class SpecialistClient:
             session_id,
             {"state": "submitting", "artifacts": [], "simulated": self.settings.simulated},
         )
+        correlation_id = correlation_id or str(uuid4())
+        started = perf_counter()
+        if on_event:
+            await on_event(
+                dict(
+                    kind="a2a",
+                    phase="request",
+                    sender="DeepAgent",
+                    receiver="Procurement specialist",
+                    question=question,
+                    project=project,
+                    as_of=as_of,
+                    correlation_id=correlation_id,
+                    operation="SendMessage",
+                )
+            )
         try:
-            async with self.client() as client:
-                request = p.SendMessageRequest(
-                    message=p.Message(
-                        message_id=str(uuid4()),
-                        role=p.ROLE_USER,
-                        parts=[
-                            p.Part(
-                                text=json.dumps(
-                                    {"question": question, "project": project, "as_of": as_of}
+            with (
+                context_for(self.settings, self.trace_client),
+                trace(
+                    "A2A SendMessage",
+                    run_type="tool",
+                    inputs={"question": question, "project": project, "as_of": as_of},
+                    metadata={"correlation_id": correlation_id},
+                ) as exchange,
+            ):
+                async with self.client() as client:
+                    metadata = {"correlation_id": correlation_id}
+                    if self.settings.langsmith_tracing:
+                        metadata["parent_trace"] = exchange.to_headers()["langsmith-trace"]
+                    request = p.SendMessageRequest(
+                        message=p.Message(
+                            message_id=str(uuid4()),
+                            role=p.ROLE_USER,
+                            metadata=metadata,
+                            parts=[
+                                p.Part(
+                                    text=json.dumps(
+                                        {"question": question, "project": project, "as_of": as_of}
+                                    )
+                                )
+                            ],
+                        )
+                    )
+                    async for event in client.send_message(request):
+                        if not event.HasField("task"):
+                            raise ValueError("specialist must return a task")
+                        data = self.payload(event.task)
+                        if on_event:
+                            await on_event(
+                                dict(
+                                    kind="a2a",
+                                    phase="response",
+                                    sender="Procurement specialist",
+                                    receiver="DeepAgent",
+                                    correlation_id=correlation_id,
+                                    remote_id=data["remote_id"],
+                                    state=data["state"],
+                                    elapsed_ms=round((perf_counter() - started) * 1000),
+                                    observations=data.get("observations", {}),
                                 )
                             )
-                        ],
-                    )
-                )
-                async for event in client.send_message(request):
-                    if not event.HasField("task"):
-                        raise ValueError("specialist must return a task")
-                    data = self.payload(event.task)
-                    return self.store.put_task(
-                        viewer_id,
-                        session_id,
-                        dict(data, simulated=self.settings.simulated),
-                        record["id"],
-                    )
-                raise ValueError("specialist returned no task")
+                        exchange.end(
+                            outputs={"state": data["state"], "remote_id": data["remote_id"]}
+                        )
+                        return self.store.put_task(
+                            viewer_id,
+                            session_id,
+                            dict(data, simulated=self.settings.simulated),
+                            record["id"],
+                        )
+                    raise ValueError("specialist returned no task")
         except BaseException:
             self.store.put_task(
                 viewer_id,

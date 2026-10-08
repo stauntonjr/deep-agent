@@ -2,7 +2,7 @@
 
 The actual local DGX/A2A procurement and SciFact browser journeys have passed.
 Procurement uses admitted synthetic corpus services through the read-only bridge;
-human review/save and OCI deployment remain unavailable. See the README for complete
+human review/save remains unavailable. The owner-authorized VPS edge / DGX deployment uses the separate [production profile](../../deploy/README.md). See the README for complete
 host startup commands and read the current handoff before changing services.
 
 ## Local startup
@@ -89,5 +89,4 @@ Bridge listens only on127.0.0.1:8101, requires Bearer authentication even for di
 checks Host, bounds request/response bytes and rejects upstream redirects. Card RPC
 endpoint is /rpc. Do not expose this port publicly. In-memory remote tasks are lost
 on restart; inspect retained local artifacts without automatically resubmitting.
-The current browser's non-simulated pending-integration banner remains conservative:
-this local bridge does not establish public procurement review/save or OCI acceptance.
+The browser labels the real integration read-only; this bridge does not establish procurement review/save. Public hosting is verified separately through its production acceptance.

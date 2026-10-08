@@ -80,3 +80,39 @@ evidence records) and375px layout passed. Download SHA256:
 Screenshots: /tmp/deepagent-real-a2a-browser.png,
 /tmp/deepagent-real-science-browser.png, /tmp/deepagent-real-mobile-browser.png.
 No production procurement, human approval/save or OCI release claim.
+
+
+## October 8 — observable A2A showcase
+
+Verified browser boundary: actual DGX DeepAgents → authenticated A2A bridge → existing
+procurement corpus read services. GPU-A returned required8/ordered6 and12source records.
+UI showed an actual SendMessage request and task reply with matching correlation IDs,
+round-trip timing, source-read count and compact quantities; raw artifact remained collapsed.
+Owned evidence/trace downloads matched persisted events; Bob received404 for foreign
+session, artifact, trace and task access. Reload, actual SciFact MCP and375px layout passed.
+Command: `PLAYWRIGHT_BROWSERS_PATH=/tmp/deepagent-playwright .venv/bin/python tests/app/browser_bridge_acceptance.py`.
+Elapsed75.81seconds. Download SHA256:
+`184327f69168434ca3f3ad057fd603d9ed75e3dc5bd408502347c1b30dcacd70`.
+Artifacts: `/tmp/deepagent-real-a2a-browser.png`, `/tmp/deepagent-real-trace.json`,
+`/tmp/deepagent-real-browser-results.json` (temporary local artifacts).
+
+Tracing boundary: mocked maintained RunTree exports verified parent relationships
+root→A2A SendMessage→Procurement A2A task→investigation/source reads across the ASGI
+transport. Default disables export even if global LANGSMITH_TRACING is set; credentials
+are only read with explicit opt-in. A real LangSmith upload is not yet verified:
+automatic approval review requires explicit approval of exported prompts/results.
+The credential was found privately under LCA; it is not committed or exposed in events.
+No second LLM, full procurement LangGraph workflow, OCI deployment or correctness
+benchmark is implied by the observed bridge exchange.
+
+
+## Public hosting acceptance boundary
+
+The owner-authorized VPS route is `https://deepagent.ediacarian.dedyn.io/`.
+Current executed checks and exact source/image identity belong to the local
+`.harness/runs/vps-deployment` run. The opt-in browser command in deploy/README exercises
+that HTTPS entrypoint with private randomized acceptance viewers. Its required assertions
+cover actual procurement A2A, scoped request/reply,8required/6ordered/12sources, actual
+SciFact MCP, reload/downloads, cross-viewer404 and narrow layout. Separate checks must
+prove TLS, authentication, persistent service restart and preservation of sibling services.
+Configuration alone is not public acceptance. LangSmith export remains a separate consent.

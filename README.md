@@ -2,15 +2,56 @@
 
 A browser evidence assistant built with [LangChain DeepAgents](https://github.com/langchain-ai/deepagents), powered by a locally hosted DGX model. It delegates procurement investigations through an authenticated A2A bridge and checks scientific claims through SciFact MCP.
 
-**Working local demo.** The real DGX → A2A → procurement and SciFact browser journeys have passed, including evidence downloads and isolation between viewers. Procurement uses the admitted **synthetic** corpus from `procurement-intelligence-lab`. OCI deployment and procurement human review/save are not enabled.
+[Open the invited demo](https://deepagent.ediacarian.dedyn.io/) (sign-in required; best-effort availability).
+
+**Verified local demo.** The real DGX → A2A → procurement and SciFact browser journeys have passed, including evidence downloads and isolation between viewers. Procurement uses the admitted **synthetic** corpus from `procurement-intelligence-lab`. The VPS edge / DGX hosting profile is described in [deployment instructions](deploy/README.md). Procurement human review/save is not enabled.
 
 ## What you can try
 
 - **Investigate a discrepancy:** compare GPU-A requirements against purchase orders, identify the 8-required / 6-ordered discrepancy, and inspect its 12 source records.
 - **Check a claim:** ask whether evidence establishes that vitamin D reduces multiple-sclerosis risk in humans; distinguish animal evidence, association and causal claims.
-- Download evidence, reload investigation history, and use separate viewer accounts with isolated sessions and tasks.
+- Watch the observed A2A request/reply, model milestones and service timings. Inspect compact evidence cards, download the complete local trace, and reload viewer-owned history.
 
 The agent must call an approved evidence tool before answering. Unsupported final answers are rejected. A returned tool result establishes evidence availability; it does not guarantee that every generated claim is correct. This first slice supports evidence investigations; unrestricted personal-assistant and coding tools remain future work.
+
+## Showcase in two minutes
+
+Open the app, choose **Investigate a discrepancy**, and send the prepared GPU-A prompt.
+Point out the progression: your request → DGX model → scoped A2A `SendMessage` →
+procurement reply → evidence → generated reviewer brief. The request/reply carry the
+same correlation ID. The reply reports the actual investigation read and 12 source reads.
+The evidence card shows **8 required / 6 ordered**; expand the raw artifact to inspect
+source records. Download the trace to retain the observed sequence, then reload the
+investigation to show persistence. Use **Check a claim** for the SciFact MCP example.
+
+Explain the actors accurately: the DeepAgents graph uses a DGX LLM; the procurement
+specialist is a deterministic, read-only A2A bridge to the existing corpus services.
+This demonstrates agent delegation and evidence transfer. Procurement LangGraph human
+review/save remains in the procurement application. The UI presents observed actions,
+not a second LLM conversation or private model reasoning.
+
+### Optional LangSmith tree
+
+External export is **off by default**, even if a global `LANGSMITH_TRACING` variable
+is set. To opt in, approve exporting demonstration prompts, generated answers and tool
+results, then set these variables in **both** the assistant and bridge terminals before
+starting them. Store a key in an owned private regular file with mode `0600` outside Git;
+`LANGSMITH_API_KEY` is also supported when no key file is configured.
+
+```sh
+export DEEPAGENT_LANGSMITH_TRACING=1
+export DEEPAGENT_LANGSMITH_PROJECT=deepagent-showcase
+export DEEPAGENT_LANGSMITH_KEY_FILE=/absolute/private/langsmith-key
+```
+
+Open the `deepagent-showcase` project in LangSmith and match the UI's trace ID to
+**DeepAgent investigation**. Expand the LangGraph/model/tool spans, then **A2A SendMessage**,
+**Procurement A2A task**, **Procurement investigation read**, and **Procurement source read**.
+The bridge joins the parent through maintained SDK trace headers in A2A metadata.
+Both processes must have export enabled for the server spans to appear. Trace IDs do
+not grant app access; LangSmith access follows its own workspace permissions. SciFact
+service internals are not instrumented by this repository. Local downloads include
+visible prompts/results and evidence, so share them intentionally.
 
 ## Install
 
@@ -105,10 +146,10 @@ make smoke
 .venv/bin/python tests/app/browser_bridge_acceptance.py
 ```
 
-The current suite contains 30 tests covering viewer ownership, bounded transports, A2A contracts, service failures and answer enforcement. The latest completed live browser journey took 76.16 seconds. See the [acceptance record](docs/project/acceptance.md).
+The current suite contains 35 tests covering viewer ownership, bounded transports, A2A contracts, service failures and answer enforcement. The October 6 live browser journey took 76.16 seconds; current showcase acceptance is recorded separately. See the [acceptance record](docs/project/acceptance.md).
 
 Use one application worker. SQLite task/history records survive restart; process-local conversation context does not. Automatic model retries are disabled. Stopping a local run does not prove remote cancellation; inspect task history before retrying an unknown outcome.
 
-No arbitrary shell execution, automatic approval/purchasing, private-repository access or external tracing is provided. Docker/Compose and Traefik files are deployment starting points; their presence does not establish OCI readiness. See [deployment and rollback](docs/project/deployment.md), [bridge contract](docs/project/bridge.md), and [project handoff](docs/project/handoff.md).
+No arbitrary shell execution, automatic approval/purchasing, private-repository access is provided. Optional LangSmith export requires explicit configuration as described above. The production profile reuses the existing VPS TLS/Tailscale edge; deployment verification is recorded separately from local tests. See [deployment and rollback](docs/project/deployment.md), [bridge contract](docs/project/bridge.md), and [project handoff](docs/project/handoff.md).
 
 Application code is MIT; dependencies retain their licenses.

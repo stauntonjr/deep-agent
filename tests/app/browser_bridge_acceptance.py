@@ -3,6 +3,7 @@
 import asyncio
 import hashlib
 import json
+import os
 import time
 from pathlib import Path
 
@@ -11,14 +12,21 @@ from playwright.async_api import async_playwright, expect
 
 async def main():
     started = time.monotonic()
+    base_url = os.getenv("DEEPAGENT_BROWSER_URL", "http://127.0.0.1:8100")
+    prefix = os.getenv("DEEPAGENT_BROWSER_PREFIX", "/tmp/deepagent-real")
+    credentials = (
+        json.loads(Path(os.environ["DEEPAGENT_BROWSER_CREDENTIALS"]).read_text())
+        if os.getenv("DEEPAGENT_BROWSER_CREDENTIALS")
+        else {name: {"username": name, "password": "local-demo-test"} for name in ("alice", "bob")}
+    )
     async with async_playwright() as pw:
         browser = await pw.chromium.launch(headless=True)
         context = await browser.new_context(
-            http_credentials={"username": "alice", "password": "local-demo-test"},
+            http_credentials=credentials["alice"],
             viewport={"width": 1280, "height": 900},
         )
         page = await context.new_page()
-        await page.goto("http://127.0.0.1:8100")
+        await page.goto(base_url)
         await page.get_by_role("button", name="Investigate a discrepancy", exact=False).click()
         await page.locator("#send").click()
         await (
@@ -27,11 +35,11 @@ async def main():
             .first.wait_for(timeout=310000)
         )
         await expect(page.locator("#send")).to_be_enabled(timeout=310000)
-        await page.screenshot(path="/tmp/deepagent-real-a2a-browser.png", full_page=True)
+        await page.screenshot(path=prefix + "-a2a-browser.png", full_page=True)
         async with page.expect_download() as download_info:
             await page.get_by_role("button", name="Download evidence").click()
-        await (await download_info.value).save_as("/tmp/deepagent-real-a2a-download.json")
-        exported = json.loads(Path("/tmp/deepagent-real-a2a-download.json").read_text())
+        await (await download_info.value).save_as(prefix + "-a2a-download.json")
+        exported = json.loads(Path(prefix + "-a2a-download.json").read_text())
         tasks = [event["task"] for event in exported["events"] if event["kind"] == "task"]
         assert tasks and tasks[-1]["state"] == "completed" and not tasks[-1]["simulated"]
         evidence = json.loads(tasks[-1]["artifacts"][0]["text"])
@@ -44,6 +52,20 @@ async def main():
             for event in exported["events"]
         )
         assert any(event["kind"] == "answer" for event in exported["events"])
+        exchange = [event for event in exported["events"] if event["kind"] == "a2a"]
+        assert [event["phase"] for event in exchange] == ["request", "response"]
+        assert exchange[0]["correlation_id"] == exchange[1]["correlation_id"]
+        assert exchange[1]["observations"]["source_count"] == 12
+        assert exchange[1]["elapsed_ms"] > 0
+        assert await page.locator(".facts").count() == 1
+        assert await page.locator(".task details[open]").count() == 0
+        assert await page.locator(".error").count() == 0
+        async with page.expect_download() as trace_info:
+            await page.get_by_role("button", name="Download trace").click()
+        await (await trace_info.value).save_as(prefix + "-trace.json")
+        local_trace = json.loads(Path(prefix + "-trace.json").read_text())
+        assert local_trace["session_id"] == exported["id"]
+        assert local_trace["events"] == exported["events"]
         await page.reload()
         await page.locator("#sessions button").first.click()
         await (
@@ -51,19 +73,14 @@ async def main():
             .get_by_text("Admitted synthetic procurement corpus", exact=False)
             .first.wait_for()
         )
-        bob = await browser.new_context(
-            http_credentials={"username": "bob", "password": "local-demo-test"}
-        )
+        bob = await browser.new_context(http_credentials=credentials["bob"])
+        assert (await bob.request.get(base_url + "/api/sessions/" + exported["id"])).status == 404
         assert (
-            await bob.request.get("http://127.0.0.1:8100/api/sessions/" + exported["id"])
+            await bob.request.get(base_url + "/api/sessions/" + exported["id"] + "/download")
         ).status == 404
+        assert (await bob.request.get(base_url + "/api/tasks/" + tasks[-1]["id"])).status == 404
         assert (
-            await bob.request.get(
-                "http://127.0.0.1:8100/api/sessions/" + exported["id"] + "/download"
-            )
-        ).status == 404
-        assert (
-            await bob.request.get("http://127.0.0.1:8100/api/tasks/" + tasks[-1]["id"])
+            await bob.request.get(base_url + "/api/sessions/" + exported["id"] + "/trace")
         ).status == 404
         await page.get_by_role("button", name="New investigation", exact=False).click()
         await page.get_by_role("button", name="Check a claim", exact=False).click()
@@ -74,10 +91,10 @@ async def main():
             .first.wait_for(timeout=310000)
         )
         await expect(page.locator("#send")).to_be_enabled(timeout=310000)
-        await page.screenshot(path="/tmp/deepagent-real-science-browser.png", full_page=True)
+        await page.screenshot(path=prefix + "-science-browser.png", full_page=True)
         await page.set_viewport_size({"width": 375, "height": 812})
         assert (await page.locator("body").bounding_box())["width"] <= 375
-        await page.screenshot(path="/tmp/deepagent-real-mobile-browser.png", full_page=True)
+        await page.screenshot(path=prefix + "-mobile-browser.png", full_page=True)
         result = {
             "actual_DGX_model": True,
             "actual_procurement_A2A": True,
@@ -85,16 +102,18 @@ async def main():
             "GPU_A_required": "8",
             "GPU_A_ordered": "6",
             "source_records": 12,
+            "observed_A2A_exchange": True,
+            "viewer_owned_trace_download": True,
             "owned_reload_download": True,
             "cross_viewer_404": True,
             "SciFact_MCP": True,
             "narrow_layout": True,
             "elapsed_seconds": round(time.monotonic() - started, 2),
             "download_sha256": hashlib.sha256(
-                Path("/tmp/deepagent-real-a2a-download.json").read_bytes()
+                Path(prefix + "-a2a-download.json").read_bytes()
             ).hexdigest(),
         }
-        Path("/tmp/deepagent-real-browser-results.json").write_text(json.dumps(result, indent=2))
+        Path(prefix + "-browser-results.json").write_text(json.dumps(result, indent=2))
         print(json.dumps(result))
         await browser.close()
 

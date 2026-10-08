@@ -1,16 +1,19 @@
 """DeepAgents orchestration; domain evidence and human authority stay in services."""
 
 import asyncio
+from time import perf_counter
 from typing import Any
+from uuid import uuid4
 
 from deepagents import create_deep_agent
 from langchain.agents.middleware import AgentMiddleware
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
-from langsmith import tracing_context
+from langsmith import trace
 from pydantic import SecretStr
 
+from .observability import client_for, context_for, stamp
 from .runs import RunCoordinator
 
 SYSTEM = """You are an evidence assistant for invited demonstration viewers.
@@ -33,8 +36,9 @@ APPROVED_TOOLS = frozenset(
 class FixedToolsMiddleware(AgentMiddleware):
     """Application capability boundary, enforced for offered and invoked tools."""
 
-    def __init__(self):
+    def __init__(self, record=None):
         self.tool_invoked = False
+        self.record = record
 
     def limited(self, request):
         return request.override(
@@ -50,7 +54,33 @@ class FixedToolsMiddleware(AgentMiddleware):
         return handler(self.limited(request))
 
     async def awrap_model_call(self, request, handler):
-        return await handler(self.limited(request))
+        started = perf_counter()
+        if self.record:
+            await self.record(
+                {
+                    "kind": "model",
+                    "phase": "started",
+                    "text": "DGX model is selecting tools or composing the brief.",
+                }
+            )
+        result = await handler(self.limited(request))
+        if self.record:
+            names = [
+                call["name"]
+                for message in result.result
+                for call in getattr(message, "tool_calls", [])
+            ]
+            await self.record(
+                {
+                    "kind": "model",
+                    "phase": "completed",
+                    "text": "Requested: " + ", ".join(names)
+                    if names
+                    else "Model response received.",
+                    "elapsed_ms": round((perf_counter() - started) * 1000),
+                }
+            )
+        return result
 
     def wrap_tool_call(self, request, handler):
         if request.tool_call["name"] not in APPROVED_TOOLS:
@@ -74,6 +104,7 @@ class Assistant:
             scifact,
             model,
         )
+        self.trace_client = client_for(settings)
         self.coordinator = RunCoordinator()
         self.histories: dict[str, list[Any]] = {}
         self.tool_names = [
@@ -84,13 +115,33 @@ class Assistant:
         ]
 
     async def run(self, viewer_id, session_id, prompt, project, as_of, lease):
+        correlation_id = str(uuid4())
         queue: asyncio.Queue = asyncio.Queue()
         evidence_observed = False
-        self.store.event(viewer_id, session_id, {"kind": "user", "text": prompt})
+        self.store.event(
+            viewer_id, session_id, stamp({"kind": "user", "text": prompt}, correlation_id)
+        )
+        trace_event = stamp(
+            {
+                "kind": "trace",
+                "text": "LangSmith tracing enabled"
+                if self.settings.langsmith_tracing
+                else "Local event trace · LangSmith export off",
+                "trace_id": correlation_id,
+                "project": self.settings.langsmith_project
+                if self.settings.langsmith_tracing
+                else None,
+                "export_enabled": self.settings.langsmith_tracing,
+            },
+            correlation_id,
+        )
+        self.store.event(viewer_id, session_id, trace_event)
+        yield trace_event
         yield {"kind": "status", "text": "Queued; waiting for the local model."}
         await self.coordinator.acquire(lease)
 
         async def record(event):
+            event = stamp(event, correlation_id)
             self.store.event(viewer_id, session_id, event)
             await queue.put(event)
 
@@ -120,7 +171,13 @@ class Assistant:
             return await execute_tool(
                 "investigate_procurement",
                 lambda: self.specialist.investigate(
-                    viewer_id, session_id, question, project, as_of
+                    viewer_id,
+                    session_id,
+                    question,
+                    project,
+                    as_of,
+                    on_event=record,
+                    correlation_id=correlation_id,
                 ),
             )
 
@@ -143,7 +200,19 @@ class Assistant:
 
         async def generate():
             try:
-                with tracing_context(enabled=False):
+                with (
+                    context_for(self.settings, self.trace_client),
+                    trace(
+                        "DeepAgent investigation",
+                        run_id=correlation_id,
+                        inputs={"question": prompt, "project": project, "as_of": as_of},
+                        metadata={
+                            "session_id": session_id,
+                            "correlation_id": correlation_id,
+                            "demo": True,
+                        },
+                    ) as root_trace,
+                ):
                     graph = create_deep_agent(
                         model=self.model,
                         tools=[
@@ -158,7 +227,7 @@ class Assistant:
                             + "These selections are already supplied to the procurement tool. "
                             + "Delegate procurement questions without asking for them again."
                         ),
-                        middleware=[FixedToolsMiddleware()],
+                        middleware=[FixedToolsMiddleware(record)],
                         name="evidence-assistant",
                     )
                     messages = self.histories.get(session_id, []) + [HumanMessage(content=prompt)]
@@ -184,6 +253,7 @@ class Assistant:
                     if not text.strip():
                         raise ValueError("empty answer")
                     await record({"kind": "answer", "text": text})
+                    root_trace.end(outputs={"answer": text})
             finally:
                 await queue.put(None)
 

@@ -99,3 +99,35 @@ Owner requested the working app and README pushed to main. Runtime listeners wer
 refreshed and the authenticated app remains available on DGX loopback8100. README
 now describes actual read-only integration and full startup; personal VS Code workspace
 file is excluded from publication. No OCI mutation or invitation distribution is implied.
+
+
+## Stronger local showcase — October 8
+
+In the owner's VS Code workspace, the new showcase candidate adds observed model milestones,
+A2A scoped request/reply cards with shared correlation IDs and actual timings, compact
+procurement quantities/source counts, collapsed raw evidence, and viewer-owned trace downloads.
+Read-only bridge authority and evidence guards remain unchanged. SDK-based LangSmith tracing
+is implemented with explicit app/bridge opt-in; a mocked exporter confirms distributed parentage.
+Credential discovery from the LCA environment succeeded without publishing the key.
+
+Current live browser acceptance passed in75.81seconds with actual DGX inference,
+procurement required8/ordered6/12sources, evidence/trace download and reload, Bob404,
+SciFact MCP and375px layout. Local app/bridge remain on127.0.0.1:8100/8101 with export off.
+Automatic approval review rejected external payload export; explicit permission was requested.
+A real LangSmith upload/tree is pending that permission and has not been claimed verified.
+The candidate is uncommitted; the personal workspace file remains untouched.
+No OCI deployment or procurement LangGraph approval/save integration was performed.
+See [showcase ADR](../adr/0014-showcase-observability.md) and
+[showcase run](../../.harness/runs/showcase-observability/run.json).
+
+
+## VPS hosting continuation — October 8
+
+Owner authorized `deepagent.ediacarian.dedyn.io` using the established VPS edge pattern.
+The production profile is [deploy/README](../../deploy/README.md): Traefik/deSEC on VPS,
+private Tailscale18100 to DGX loopback8100, non-root read-only app container, persistent
+user-service backing readers, randomized private credentials and durable data. Existing
+model and sibling applications remain under their existing supervisors. No LangSmith
+export or invitation distribution is authorized by this hosting request. Exact artifact,
+public browser and rollout status are recorded in the local `vps-deployment` engineering
+run; consult that evidence rather than inferring public readiness from these files.

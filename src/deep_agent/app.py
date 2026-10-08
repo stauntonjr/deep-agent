@@ -111,6 +111,7 @@ def create_app(settings: Settings, store: Store, assistant):
             "status": "ok",
             "simulated": settings.simulated,
             "procurement_review": "pending integration",
+            "tracing": "langsmith" if settings.langsmith_tracing else "local",
         }
 
     @app.get("/api/sessions")
@@ -140,6 +141,17 @@ def create_app(settings: Settings, store: Store, assistant):
         return PlainTextResponse(
             json.dumps(data, indent=2),
             headers={"Content-Disposition": 'attachment; filename="evidence-brief.json"'},
+        )
+
+    @app.get("/api/sessions/{sid}/trace")
+    async def trace_download(sid: str, identity=Depends(viewer)):
+        data = store.owned(identity, sid)
+        return PlainTextResponse(
+            json.dumps(
+                dict(schema_version="deepagent-trace/v1", session_id=sid, events=data["events"]),
+                indent=2,
+            ),
+            headers={"Content-Disposition": 'attachment; filename="delegation-trace.json"'},
         )
 
     @app.get("/api/tasks/{tid}")
