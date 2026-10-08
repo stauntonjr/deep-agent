@@ -2,7 +2,7 @@
 
 Owner-authorized hostname: `deepagent.ediacarian.dedyn.io`.
 The VPS terminates TLS using its existing Traefik `desecresolver` and watched file
-provider. `traefik.deepagent.yaml` forwards to DGX tailnet port18100; Tailscale Serve
+provider. `traefik.deepagent.yaml` forwards to DGX tailnet port18100; Tailscale Serve TCP
 forwards that private listener to127.0.0.1:8100. Host headers are preserved for the
 application's fixed HTTPS origin. No model, A2A, database or MCP port is public.
 
@@ -35,7 +35,7 @@ export DEEPAGENT_REVISION=<full-source-revision>
 export DEEPAGENT_STATE_DIR=/home/jrs/deep-agent/.harness/runs/vps-deployment/private
 export DEEPAGENT_UID=$(id -u) DEEPAGENT_GID=$(id -g)
 docker compose -f deploy/compose.dgx.yaml up -d --no-deps assistant
-tailscale serve --bg --http=18100 http://127.0.0.1:8100
+tailscale serve --bg --tcp=18100 tcp://127.0.0.1:8100
 ```
 
 DGX user lingering and Docker/Tailscale restart behavior retain services across logout.

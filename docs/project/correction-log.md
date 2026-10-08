@@ -515,3 +515,23 @@ double quotes. Rendered YAML converted newline escapes into literal newlines ins
 that Python string (`SyntaxError: unterminated string literal`). No container was started
 with the invalid command. Replaced it with YAML's literal block and compiled the rendered
 Python successfully. Guard: compile the rendered command, not only validate Compose YAML.
+
+
+## October 8 — public Host forwarding and narrow VPS reload
+
+Tailscale HTTP Serve18100 returned404 for the public Host; substituting its MagicDNS
+Host reached the app but returned403. No app authority changed. Independent technical
+and scope reviews selected maintained raw TCP forwarding on only18100, preserving
+public Host bytes and the app's checks; sibling18090/18091 bindings remain unchanged.
+The initial HTTP transport remains recorded as failed. Guard: verify the public Host
+through the private forwarding boundary before attributing errors to the app.
+
+VPS full Compose validation refused an unrelated NetBird service with neither image
+nor build context. It did not reload the DNS updater. Corrected path restarted only
+the existing ddns-updater container after adding the requested record; no other service
+was changed. Guard: use the smallest verified supervisor boundary for additive hosting.
+
+Direct host reading of root-owned ACME storage was denied. No secret was printed or
+file modified. Parsed the container's existing storage through a captured subprocess,
+printing only whether the requested hostname's certificate existed. Guard: keep private
+ACME material in its existing owner boundary and inspect only certificate metadata.
